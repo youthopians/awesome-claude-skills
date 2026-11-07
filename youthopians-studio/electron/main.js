@@ -21,7 +21,6 @@ function createWindow() {
     width: 1440, height: 900, minWidth: 380, minHeight: 600,
     title: 'Youthopians Studio',
     backgroundColor: '#FFF8E7',
-    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true }
   });
   win.loadFile(buildPage());

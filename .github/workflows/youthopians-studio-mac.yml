@@ -1,0 +1,75 @@
+name: Youthopians Studio macOS build
+
+on:
+  push:
+    branches: [claude/youthful-shannon-uuqssp]
+    paths:
+      - 'youthopians-studio/**'
+      - '.github/workflows/youthopians-studio-mac.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  dmg:
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: youthopians-studio
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build app bundles (Apple Silicon + Intel)
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx electron-builder --mac dir --arm64 --x64 --publish never
+
+      - name: Ad-hoc sign and package DMGs
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          for ARCH in arm64 x64; do
+            if [ "$ARCH" = "arm64" ]; then DIR=release/mac-arm64; else DIR=release/mac; fi
+            APP="$DIR/Youthopians Studio.app"
+            test -d "$APP"
+            codesign --force --deep --sign - "$APP"
+            codesign --verify --deep --strict "$APP"
+            STAGE="stage-$ARCH"
+            mkdir -p "$STAGE"
+            cp -R "$APP" "$STAGE/"
+            ln -s /Applications "$STAGE/Applications"
+            hdiutil create -volname "Youthopians Studio" -srcfolder "$STAGE" -ov -format UDZO \
+              "release/Youthopians-Studio-$VERSION-$ARCH.dmg"
+          done
+          ls -lh release/*.dmg
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: youthopians-studio-mac
+          path: youthopians-studio/release/*.dmg
+
+      - name: Publish release with DMGs
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: youthopians-studio-v1.0.${{ github.run_number }}
+          name: Youthopians Studio 1.0 (build ${{ github.run_number }})
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          body: |
+            Mac installers for Youthopians Studio.
+
+            - **Apple Silicon (M1/M2/M3/M4):** `Youthopians-Studio-*-arm64.dmg`
+            - **Intel Mac:** `Youthopians-Studio-*-x64.dmg`
+
+            Open the DMG and drag **Youthopians Studio** into **Applications**.
+            The app is not notarized by Apple, so the first time: right-click the app → **Open** → **Open**.
+            If macOS says it "can't be opened", go to System Settings → Privacy & Security → **Open Anyway**.
+          files: youthopians-studio/release/*.dmg

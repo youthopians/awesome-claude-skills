@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   dmg:
-    runs-on: macos-14
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: youthopians-studio
@@ -24,37 +24,31 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
+      - name: Install tools
+        run: sudo apt-get update && sudo apt-get install -y genisoimage
 
-      - name: Build app bundles (Apple Silicon + Intel)
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build Mac app bundles (Apple Silicon + Intel)
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
         run: npx electron-builder --mac dir --arm64 --x64 --publish never
 
-      - name: Ad-hoc sign and package DMGs
+      - name: Package DMGs
         run: |
           set -euo pipefail
           VERSION=$(node -p "require('./package.json').version")
           for ARCH in arm64 x64; do
             if [ "$ARCH" = "arm64" ]; then DIR=release/mac-arm64; else DIR=release/mac; fi
-            APP="$DIR/Youthopians Studio.app"
-            test -d "$APP"
-            codesign --force --deep --sign - "$APP"
-            codesign --verify --deep --strict "$APP"
             STAGE="stage-$ARCH"
             mkdir -p "$STAGE"
-            cp -R "$APP" "$STAGE/"
-            ln -s /Applications "$STAGE/Applications"
-            hdiutil create -volname "Youthopians Studio" -srcfolder "$STAGE" -ov -format UDZO \
-              "release/Youthopians-Studio-$VERSION-$ARCH.dmg"
+            cp -a "$DIR/Youthopians Studio.app" "$STAGE/"
+            ln -sfn /Applications "$STAGE/Applications"
+            genisoimage -quiet -V "Youthopians Studio" -D -R -apple -no-pad \
+              -o "release/Youthopians-Studio-$VERSION-$ARCH.dmg" "$STAGE"
           done
           ls -lh release/*.dmg
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: youthopians-studio-mac
-          path: youthopians-studio/release/*.dmg
 
       - name: Publish release with DMGs
         uses: softprops/action-gh-release@v2
@@ -66,10 +60,11 @@ jobs:
           body: |
             Mac installers for Youthopians Studio.
 
-            - **Apple Silicon (M1/M2/M3/M4):** `Youthopians-Studio-*-arm64.dmg`
+            - **Apple Silicon (M1–M4):** `Youthopians-Studio-*-arm64.dmg`
             - **Intel Mac:** `Youthopians-Studio-*-x64.dmg`
 
-            Open the DMG and drag **Youthopians Studio** into **Applications**.
-            The app is not notarized by Apple, so the first time: right-click the app → **Open** → **Open**.
-            If macOS says it "can't be opened", go to System Settings → Privacy & Security → **Open Anyway**.
+            1. Open the DMG and drag **Youthopians Studio** into **Applications**.
+            2. The app is not notarized by Apple. Before the first launch, run once in Terminal:
+               `xattr -cr "/Applications/Youthopians Studio.app"`
+            3. Open the app. If macOS still blocks it: System Settings → Privacy & Security → **Open Anyway**.
           files: youthopians-studio/release/*.dmg

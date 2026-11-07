@@ -55,6 +55,13 @@ npm run dist:win     # build a Windows installer .exe (run on Windows)
 
 Installers are written to `release/`. Build the macOS installer on a Mac and the Windows installer on Windows (or use CI runners for each). Unsigned builds will show a Gatekeeper or SmartScreen warning the first time. Add an Apple Developer ID or a Windows code-signing certificate to remove it.
 
+### Installing the Mac DMG
+1. Open the DMG. Use **arm64** for Apple Silicon (M1–M4) Macs and **x64** for Intel Macs (Apple menu → About This Mac shows which one you have).
+2. Drag **Youthopians Studio** onto **Applications**.
+3. The app is not notarized by Apple, so the first time you open it, run this once in Terminal:
+   `xattr -cr "/Applications/Youthopians Studio.app"`
+   Then open it normally. If macOS still blocks it, go to System Settings → Privacy & Security → **Open Anyway**.
+
 ## Data
 
 - Data is stored locally on each computer:

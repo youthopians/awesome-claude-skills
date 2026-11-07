@@ -1,0 +1,961 @@
+<title>Youthopians Studio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: production-desk app shell. Left rail = navigation + projects, main = workspace, right drawer = record detail.
+   Youthopians house style: cream paper, deep-blue structure, amber step markers, coral signal. */
+:root{
+  --bg:#FFF8E7; --surface:#FFFDF7; --sunk:#F6EDD6; --line:#E7DCC0; --line-strong:#D4C59F;
+  --ink:#0F1E36; --muted:#5B6474; --faint:#8B90A0;
+  --blue:#0056B8; --blue-ink:#FFFFFF; --blue-soft:#E1ECFA;
+  --amber:#F4A200; --amber-soft:#FDF0CF; --coral:#FF6B6B; --coral-soft:#FFE4E1;
+  --ok:#1F8A5B; --ok-soft:#DDF2E7; --warn:#B86E00; --warn-soft:#FDF0CF; --bad:#D64545; --bad-soft:#FBE3E3;
+  --shadow:0 10px 30px rgba(15,30,54,.14);
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-head:"Barlow Condensed","Barlow","Arial Narrow",system-ui,sans-serif;
+  --r:8px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1524; --surface:#142035; --sunk:#0F1A2C; --line:#22314D; --line-strong:#33476B;
+  --ink:#F3EEDF; --muted:#A9B2C3; --faint:#7C8699;
+  --blue:#4D9BFF; --blue-ink:#071226; --blue-soft:#18315A;
+  --amber:#F7B733; --amber-soft:#3A2E10; --coral:#FF8585; --coral-soft:#3D1F24;
+  --ok:#4CC28A; --ok-soft:#123326; --warn:#F7B733; --warn-soft:#3A2E10; --bad:#FF7A7A; --bad-soft:#3D1F24;
+  --shadow:0 10px 30px rgba(0,0,0,.5); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1524; --surface:#142035; --sunk:#0F1A2C; --line:#22314D; --line-strong:#33476B;
+  --ink:#F3EEDF; --muted:#A9B2C3; --faint:#7C8699;
+  --blue:#4D9BFF; --blue-ink:#071226; --blue-soft:#18315A;
+  --amber:#F7B733; --amber-soft:#3A2E10; --coral:#FF8585; --coral-soft:#3D1F24;
+  --ok:#4CC28A; --ok-soft:#123326; --warn:#F7B733; --warn-soft:#3A2E10; --bad:#FF7A7A; --bad-soft:#3D1F24;
+  --shadow:0 10px 30px rgba(0,0,0,.5); color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--f-body);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,h4{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.02em;margin:0;text-wrap:balance;line-height:1.1}
+h1{font-size:1.9rem} h2{font-size:1.25rem} h3{font-size:1.02rem;letter-spacing:.05em}
+a{color:var(--blue)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.eyebrow{font:600 .72rem/1 var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)} .small{font-size:.85rem}
+
+/* shell */
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);height:100%}
+.side{background:var(--blue);color:#fff;display:flex;flex-direction:column;gap:18px;padding:18px 12px 14px max(12px,env(safe-area-inset-left,0px));overflow-y:auto}
+:root[data-theme="dark"] .side{background:#0A2A55}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .side{background:#0A2A55}}
+.brand{display:flex;align-items:center;gap:10px;padding:0 6px}
+.brand-mark{width:34px;height:34px;display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.brand-mark i{display:block;border-radius:2px} .brand-mark i:nth-child(1){background:#F4A200}.brand-mark i:nth-child(2){background:#FF6B6B}.brand-mark i:nth-child(3){background:#FFF8E7}.brand-mark i:nth-child(4){background:#F4A200;opacity:.55}
+.brand b{font:700 1.15rem/1 var(--f-head);text-transform:uppercase;letter-spacing:.04em;display:block}
+.brand span{font-size:.72rem;opacity:.8;letter-spacing:.06em}
+.side .who{background:rgba(255,255,255,.1);border-radius:var(--r);padding:8px 10px;display:flex;flex-direction:column;gap:4px}
+.side .who label{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+.side .who select{background:transparent;border:0;color:#fff;font-weight:600;padding:0;cursor:pointer}
+.side .who select option{color:#0F1E36}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-h{font:600 .68rem/1 var(--f-body);letter-spacing:.14em;text-transform:uppercase;opacity:.7;padding:8px 8px 6px;display:flex;justify-content:space-between;align-items:center}
+.nav-h button{background:none;border:0;color:#fff;opacity:.9;cursor:pointer;font-size:1.1rem;line-height:1;padding:0 4px}
+.nav a{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:6px;color:#fff;text-decoration:none;font-weight:500;font-size:.93rem}
+.nav a:hover{background:rgba(255,255,255,.1)}
+.nav a.on{background:#FFF8E7;color:#0F1E36}
+.nav a svg{width:17px;height:17px;flex:none}
+.nav a .count{margin-left:auto;font-size:.75rem;background:rgba(255,255,255,.18);border-radius:10px;padding:1px 7px}
+.nav a.on .count{background:#0056B8;color:#fff}
+.nav a .dot{width:11px;height:11px;border-radius:3px;flex:none;box-shadow:0 0 0 1.5px rgba(255,255,255,.85)}
+.nav a .pname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side-foot{margin-top:auto;display:flex;gap:6px;flex-wrap:wrap;padding:0 4px}
+.side-foot button{background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:6px;padding:6px 9px;font-size:.78rem;cursor:pointer}
+.side-foot button:hover{background:rgba(255,255,255,.22)}
+.tagline{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;opacity:.65;padding:0 8px;display:flex;align-items:center;gap:6px}
+.tagline i{width:9px;height:9px;background:#FF6B6B;display:inline-block}
+
+.main{display:flex;flex-direction:column;min-width:0;height:100%;overflow:hidden}
+.top{display:flex;align-items:center;gap:10px;padding:12px max(16px,env(safe-area-inset-right,0px)) 12px 20px;border-bottom:1px solid var(--line);background:var(--bg)}
+.menu-btn{display:none}
+.search{position:relative;flex:1;max-width:460px}
+.search input{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--line);background:var(--surface);border-radius:20px}
+.search svg{position:absolute;left:11px;top:50%;width:16px;height:16px;transform:translateY(-50%);color:var(--faint)}
+.results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);z-index:40;max-height:60vh;overflow:auto}
+.results button{display:flex;gap:8px;width:100%;text-align:left;background:none;border:0;padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--line)}
+.results button:hover{background:var(--sunk)}
+.top-actions{margin-left:auto;display:flex;gap:8px}
+.view{flex:1;overflow:auto;padding-block:22px 60px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+
+/* controls */
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);background:var(--surface);border-radius:6px;padding:7px 12px;cursor:pointer;font-weight:600;font-size:.88rem;white-space:nowrap}
+.btn:hover{border-color:var(--blue)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:var(--blue-ink)}
+.btn.amber{background:var(--amber);border-color:var(--amber);color:#0F1E36}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.sm{padding:4px 9px;font-size:.8rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn svg{width:15px;height:15px}
+input.field,select.field,textarea.field{width:100%;padding:7px 10px;border:1px solid var(--line);background:var(--surface);border-radius:6px}
+textarea.field{min-height:70px;resize:vertical}
+label.lbl .field{font-size:.92rem;font-weight:400;letter-spacing:0;color:var(--ink)}
+.legend5{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+label.lbl{display:flex;flex-direction:column;gap:4px;font-size:.78rem;font-weight:600;color:var(--muted);letter-spacing:.03em}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+
+/* chips */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:12px;font-size:.76rem;font-weight:600;white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.s-ok{background:var(--ok-soft);color:var(--ok)} .s-warn{background:var(--warn-soft);color:var(--warn)} .s-bad{background:var(--bad-soft);color:var(--bad)} .s-idle{background:var(--sunk);color:var(--muted)} .s-blue{background:var(--blue-soft);color:var(--blue)}
+.tag{display:inline-block;padding:1px 7px;border-radius:4px;background:var(--sunk);color:var(--muted);font-size:.74rem;font-weight:600}
+.av{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;font-size:.68rem;font-weight:700;color:#fff;flex:none;letter-spacing:.02em}
+.due{font-size:.8rem;color:var(--muted);white-space:nowrap} .due.late{color:var(--bad);font-weight:600} .due.soon{color:var(--warn);font-weight:600}
+.prio{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.prio.High{color:var(--coral)} .prio.Medium{color:var(--warn)} .prio.Low{color:var(--faint)}
+
+/* five-step tracker */
+.steps5{display:inline-flex;gap:3px;align-items:center}
+.steps5 i{width:18px;height:18px;display:grid;place-items:center;font:700 .62rem/1 var(--f-body);font-style:normal;border-radius:3px;background:var(--sunk);color:var(--faint);border:1px solid var(--line)}
+.steps5 i.done{background:var(--blue);color:var(--blue-ink);border-color:var(--blue)}
+.steps5 i.cur{background:var(--amber);color:#0F1E36;border-color:var(--amber)}
+.steps5 i.ret{background:var(--coral);color:#fff;border-color:var(--coral)}
+
+/* panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.panel-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.panel-h .sq{width:10px;height:10px;background:var(--amber)}
+.panel-b{padding:14px 16px}
+.cols{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px}
+.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+
+.page-h{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.page-h .grow{flex:1;min-width:240px}
+.page-h p{margin:6px 0 0;color:var(--muted)}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:4px;cursor:pointer;text-align:left}
+.kpi b{font:700 2rem/1 var(--f-head)}
+.kpi.alert b{color:var(--coral)}
+.kpi:hover{border-color:var(--blue)}
+
+/* tables */
+.tbl-wrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:.9rem}
+.tbl th{font:600 .7rem/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr.click{cursor:pointer} .tbl tr.click:hover td{background:var(--sunk)}
+.tbl tr:last-child td{border-bottom:0}
+
+/* tabs */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:9px 13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tabs button.on{color:var(--ink);border-color:var(--amber)}
+
+/* list view */
+.phase{display:flex;flex-direction:column}
+.phase-h{display:flex;align-items:center;gap:10px;padding:10px 4px;cursor:pointer;user-select:none}
+.phase-h .n{width:22px;height:22px;background:var(--amber);color:#0F1E36;display:grid;place-items:center;font:700 .75rem/1 var(--f-body)}
+.phase-h .cnt{color:var(--faint);font-size:.82rem}
+.trow{display:grid;grid-template-columns:28px minmax(0,1fr) 130px 110px 90px 110px;gap:10px;align-items:center;padding:8px 10px;border-top:1px solid var(--line);background:var(--surface);cursor:pointer}
+.trow:hover{background:var(--sunk)}
+.trow .title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trow.done .title{text-decoration:line-through;color:var(--faint)}
+.chk{width:20px;height:20px;border-radius:50%;border:2px solid var(--line-strong);background:transparent;cursor:pointer;display:grid;place-items:center;padding:0}
+.chk.on{background:var(--ok);border-color:var(--ok)}
+.chk.on::after{content:"";width:6px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.addrow{display:flex;gap:8px;padding:8px 10px;border-top:1px solid var(--line);background:var(--surface)}
+.addrow input{flex:1;border:0;background:transparent;padding:4px}
+.phase-list{border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.phase-list .trow:first-child{border-top:0}
+
+/* board */
+.board{display:grid;grid-template-columns:repeat(4,minmax(240px,1fr));gap:14px;overflow-x:auto;padding-bottom:6px}
+.col{background:var(--sunk);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:8px;min-height:300px}
+.col.over{outline:2px dashed var(--blue)}
+.col-h{display:flex;justify-content:space-between;align-items:center;padding:2px 4px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 11px;display:flex;flex-direction:column;gap:8px;cursor:grab}
+.card:hover{border-color:var(--blue)}
+.card .meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card .meta .av{margin-left:auto}
+
+/* timeline */
+.tl{position:relative;min-width:900px}
+.tl-head{display:grid;position:sticky;top:0;background:var(--bg);z-index:2;border-bottom:1px solid var(--line)}
+.tl-head div{font-size:.7rem;color:var(--muted);padding:6px 0 6px 4px;border-left:1px solid var(--line);white-space:nowrap;overflow:hidden}
+.tl-row{display:grid;grid-template-columns:220px 1fr;align-items:center;border-bottom:1px solid var(--line);min-height:34px}
+.tl-row .lab{font-size:.85rem;padding:6px 10px 6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.tl-row.ph .lab{font-family:var(--f-head);text-transform:uppercase;font-weight:700;letter-spacing:.05em;color:var(--blue)}
+.tl-track{position:relative;height:34px}
+.bar{position:absolute;top:8px;height:18px;border-radius:4px;background:var(--blue);cursor:pointer;min-width:6px}
+.bar.done{background:var(--ok)} .bar.late{background:var(--coral)} .bar.review{background:var(--amber)}
+.bar.dl{background:transparent;border:2px solid var(--amber);transform:rotate(45deg);width:14px!important;height:14px;top:10px;border-radius:2px;background:var(--amber-soft)}
+.today-line{position:absolute;top:0;bottom:0;width:2px;background:var(--coral);z-index:1;pointer-events:none}
+
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--line);gap:1px}
+.cal .dow{background:var(--sunk);font:600 .7rem/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:8px}
+.cal .day{background:var(--surface);min-height:104px;padding:6px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.cal .day.out{background:var(--sunk)} .cal .day.out .dn{color:var(--faint)}
+.cal .dn{font-size:.78rem;font-weight:600}
+.cal .day.today .dn{background:var(--coral);color:#fff;border-radius:10px;padding:0 6px;align-self:flex-start}
+.ev{font-size:.74rem;padding:2px 5px;border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;color:#fff;border:0;text-align:left}
+.ev.dl{background:var(--amber);color:#0F1E36}
+.ev.done{opacity:.5;text-decoration:line-through}
+
+/* drawer */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow);z-index:50;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.dr-h{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.dr-b{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+.dr-b>*{flex:none}
+.dr-title{font:600 1.3rem/1.25 var(--f-body);border:1px solid transparent;border-radius:6px;padding:4px 6px;margin:-4px -6px;width:calc(100% + 12px);background:transparent}
+.dr-title:hover,.dr-title:focus{border-color:var(--line)}
+.props{display:grid;grid-template-columns:120px minmax(0,1fr);gap:8px 12px;align-items:center;font-size:.9rem}
+.props>span{color:var(--muted);font-size:.82rem}
+.props select,.props input{border:1px solid transparent;background:transparent;padding:4px 6px;border-radius:5px;width:100%}
+.props select:hover,.props input:hover,.props select:focus,.props input:focus{border-color:var(--line)}
+.sub{display:flex;align-items:center;gap:8px;padding:5px 0}
+.sub input[type=text]{flex:1;border:0;background:transparent;padding:2px}
+.comment{display:flex;gap:10px} .comment .bub{background:var(--sunk);border-radius:8px;padding:8px 10px;flex:1}
+.scrim{position:fixed;inset:0;background:rgba(15,30,54,.35);z-index:45}
+
+/* QC step blocks */
+.qstep{border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.qstep-h{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--sunk)}
+.qstep-h .n{width:26px;height:26px;display:grid;place-items:center;font:700 .85rem/1 var(--f-head);background:var(--line);color:var(--muted)}
+.qstep.done .qstep-h .n{background:var(--blue);color:var(--blue-ink)}
+.qstep.cur .qstep-h .n{background:var(--amber);color:#0F1E36}
+.qstep.cur{border-color:var(--amber)}
+.qstep.locked .qstep-b{opacity:.55}
+.qstep-b{padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.qitem{display:flex;gap:9px;align-items:flex-start;font-size:.9rem;cursor:pointer}
+.qitem input{margin-top:3px;accent-color:var(--blue);width:16px;height:16px;flex:none}
+.signoff{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:8px;border-top:1px dashed var(--line);margin-top:4px}
+.signed{font-size:.82rem;color:var(--ok);font-weight:600}
+.callout{border-left:4px solid var(--amber);background:var(--amber-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.88rem}
+.callout.bad{border-color:var(--coral);background:var(--coral-soft)}
+.callout.ok{border-color:var(--ok);background:var(--ok-soft)}
+.risk{display:inline-grid;place-items:center;min-width:30px;height:24px;border-radius:4px;font-weight:700;font-size:.8rem;padding:0 6px}
+
+/* modal */
+.modal-wrap{position:fixed;inset:0;background:rgba(15,30,54,.45);z-index:60;display:grid;place-items:center;padding:16px}
+.modal{background:var(--surface);border-radius:10px;box-shadow:var(--shadow);width:min(620px,100%);max-height:90vh;overflow:auto;display:flex;flex-direction:column}
+.modal-h{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.modal-b{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.modal-f{padding:12px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:20px;font-weight:600;font-size:.88rem;z-index:80;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+
+.feed{display:flex;flex-direction:column;gap:10px}
+.feed div{display:flex;gap:10px;font-size:.88rem;align-items:flex-start}
+.feed time{color:var(--faint);font-size:.78rem;white-space:nowrap;margin-left:auto}
+.bar-meter{height:8px;background:var(--sunk);border-radius:4px;overflow:hidden;display:flex}
+.bar-meter i{display:block;height:100%}
+.list-plain{display:flex;flex-direction:column}
+.list-plain>*{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;text-align:left;width:100%}
+.list-plain>*:last-child{border-bottom:0}
+.empty{padding:26px;text-align:center;color:var(--muted);font-size:.92rem}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.member{display:flex;flex-direction:column;gap:12px;padding:16px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters select{width:auto}
+.sample-flag{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--coral-soft);color:var(--coral);padding:2px 7px;border-radius:4px}
+
+@media (max-width:1000px){.c4,.c5,.c6,.c7,.c8{grid-column:span 12}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:fixed;inset:0 auto 0 0;width:270px;z-index:55;transform:translateX(-100%);transition:transform .2s;padding-top:calc(18px + env(safe-area-inset-top,0px))}
+  .side.open{transform:none;box-shadow:var(--shadow)}
+  .menu-btn{display:inline-flex}
+  .top{padding-left:max(12px,env(safe-area-inset-left,0px))}
+  .top-actions .lbl-txt{display:none}
+  .trow{grid-template-columns:28px minmax(0,1fr) 84px;}
+  .trow .hide-sm{display:none}
+  .grid2,.grid3{grid-template-columns:1fr}
+  h1{font-size:1.5rem}
+  .props{grid-template-columns:100px minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app" id="app">
+  <aside class="side" id="side"></aside>
+  <main class="main">
+    <header class="top">
+      <button class="btn ghost menu-btn" data-act="menu" aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Search tasks, projects, deliverables…" autocomplete="off" aria-label="Search">
+        <div class="results" id="results" hidden></div>
+      </div>
+      <div class="top-actions">
+        <button class="btn" data-act="new-project"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h6l2 2h10v10H3z"/></svg><span class="lbl-txt">New project</span></button>
+        <button class="btn primary" data-act="new-task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span class="lbl-txt">New task</span></button>
+      </div>
+    </header>
+    <section class="view" id="view"></section>
+  </main>
+</div>
+<div class="scrim" id="scrim" hidden data-act="close-drawer"></div>
+<div class="drawer" id="drawer" hidden></div>
+<div class="modal-wrap" id="modal" hidden></div>
+<div class="toast" id="toast" role="status"></div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+
+<script>
+(function(){
+'use strict';
+/* ---------- dates ---------- */
+const TODAY=new Date();TODAY.setHours(0,0,0,0);
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{if(!s)return null;const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(n,base)=>{const d=base?parse(base):new Date(TODAY);d.setDate(d.getDate()+n);return ymd(d)};
+const diff=(a,b)=>Math.round((parse(a)-parse(b))/864e5);
+const fromToday=s=>s?Math.round((parse(s)-TODAY)/864e5):null;
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fmt=s=>{if(!s)return '—';const d=parse(s);return d.getDate()+' '+MON[d.getMonth()]+(d.getFullYear()!==TODAY.getFullYear()?' '+d.getFullYear():'')};
+const rel=s=>{const n=fromToday(s);if(n===null)return '';if(n===0)return 'Today';if(n===1)return 'Tomorrow';if(n===-1)return 'Yesterday';if(n<0)return Math.abs(n)+'d overdue';if(n<7)return 'In '+n+'d';return fmt(s)};
+const nowStamp=()=>{const d=new Date();return ymd(d)+' '+pad(d.getHours())+':'+pad(d.getMinutes())};
+const uid=p=>p+Math.random().toString(36).slice(2,9);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=(n,c)=>(c||'ETB')+' '+Number(n||0).toLocaleString('en-US');
+
+/* ---------- domain constants ---------- */
+const PHASES=['Inception','Pre-production','Production','Post-production','Language & access','Client review','Delivery'];
+const STATUSES=[['todo','To do'],['doing','In progress'],['review','In review'],['done','Done']];
+const PSTAT={'On track':'s-ok','At risk':'s-warn','Off track':'s-bad','On hold':'s-idle','Not started':'s-blue','Complete':'s-ok'};
+const PTYPES=['Documentary','Commercial','Photography','Design & Print','Social & Digital','Event coverage'];
+const COLORS=['#0056B8','#F4A200','#FF6B6B','#1F8A5B','#7A4FD1','#0FA3B1','#C2410C','#3B5B8C'];
+const TEMPLATES={
+ 'Documentary':[[0,'Kick-off & brief alignment'],[0,'Inception note & work plan'],[1,'Story research & character selection'],[1,'Interview guide & treatment'],[1,'Consent forms & safeguarding plan'],[1,'Field logistics, permits & travel'],[2,'Field shoot'],[2,'Media backup & logging (3-2-1)'],[3,'Rough cut'],[3,'Fine cut'],[3,'Colour grade & audio mix'],[4,'Transcription & translation'],[4,'Subtitles & captions'],[5,'Client review round 1'],[5,'Client review round 2'],[6,'Masters, versions & handover']],
+ 'Commercial':[[0,'Creative brief & kick-off'],[1,'Concept & script'],[1,'Storyboard / AI previz'],[1,'Casting & location recce'],[1,'Pre-production meeting (PPM)'],[2,'Shoot day'],[2,'Media backup & logging (3-2-1)'],[3,'Offline edit'],[3,'Online: grade, VFX & sound design'],[4,'Supers, legal lines & translations'],[5,'Client review & approvals'],[6,'Broadcast & social masters']],
+ 'Photography':[[0,'Brief & shot list'],[1,'Locations, talent & model releases'],[2,'Photo shoot'],[2,'Backup & culling'],[3,'Selects & retouching'],[4,'Captions & metadata'],[5,'Client selects review'],[6,'Final delivery (web + print)']],
+ 'Design & Print':[[0,'Brief & content gathering'],[1,'Moodboard & layout concepts'],[3,'Layout & design'],[3,'Infographics & illustrations'],[4,'Copy edit & translation'],[5,'Client proof round 1'],[5,'Client proof round 2'],[6,'Print-ready files & printer handover']],
+ 'Social & Digital':[[0,'Monthly strategy & KPIs'],[1,'Content calendar'],[1,'Copywriting'],[2,'Content shoot'],[3,'Design & motion assets'],[4,'Captions & translations'],[5,'Client calendar approval'],[6,'Scheduling & publishing'],[6,'Performance report']],
+ 'Event coverage':[[0,'Brief & run of show'],[1,'Crew plan & shot list'],[1,'Accreditation & access'],[2,'Event day coverage'],[2,'Same-day social highlights'],[3,'Recap film edit'],[3,'Photo selects & retouch'],[5,'Client review'],[6,'Final handover']]
+};
+const TEMPLATE_ASSUMPTIONS=[
+ ['Client','Client supplies an approved brief and key messages before inception sign-off.'],
+ ['Scope','Two rounds of consolidated client feedback are included in the fee.'],
+ ['Logistics','Locations are accessible and any permits are arranged by the client or partner.'],
+ ['Schedule','Interviewees and talent are available on the planned shoot dates.'],
+ ['Rights & consent','Music and stock are licensed for the agreed territory, platforms and duration.']
+];
+const ACATS=['Scope','Budget','Schedule','Client','Logistics','Rights & consent','Technical','Language'];
+const CONF=['Verified','To confirm','Unsupported'];
+const OUTCOMES=['Confirmed','Rejected → change request','Converted to risk'];
+
+/* The 5-step delivery check */
+const QC=[
+ {name:'Brief & scope match',owner:'Producer',items:['Matches the approved brief, script or concept','Quantity, duration and versions match the deliverable spec','Correct language versions are included','Latest approved version is the one being checked']},
+ {name:'Technical QC',owner:'Editor / Colorist',items:['Picture: focus, exposure and colour consistent; no flash frames or dropouts','Sound: dialogue clear, levels to spec (-14 LUFS web / -23 LUFS broadcast)','Resolution, frame rate, aspect ratio and codec match spec','Subtitles timed, readable and spell-checked','File names follow the naming convention']},
+ {name:'Editorial & factual',owner:'Head of Creative',items:['Names, titles, dates and locations verified','Claims and figures checked against approved source material','Translations reviewed by a native speaker','Logos, brand colours and legal lines follow the client guidelines']},
+ {name:'Ethics, consent & rights',owner:'Producer',items:['Signed consent / release on file for every identifiable person','Dignity-first review passed: no exploitative or misleading framing','Safeguarding check for minors and at-risk people (identities protected where needed)','Music, stock and fonts licensed for this use','AI-generated or AI-altered content is disclosed and not presented as documentary evidence']},
+ {name:'Approval & handover',owner:'Head of Production',items:['Internal sign-off by Head of Creative','Client approval recorded in writing','Masters and project files backed up (3-2-1 rule)','Delivered via the agreed channel and format','Client confirmed receipt']}
+];
+/* The 5-step assumption check */
+const ASTEPS=[
+ {name:'State it',hint:'Write the assumption as one testable sentence that starts "We assume…".'},
+ {name:'Evidence',hint:'Where does it come from, and how sure are we? Verified needs a document, email or signed reference.'},
+ {name:'Impact if wrong',hint:'Describe what breaks if it is false and rate impact and likelihood from 1 to 5.'},
+ {name:'Validate',hint:'Name an owner, the method (ask client, check contract, site recce…) and a validate-by date.'},
+ {name:'Decide & log',hint:'Record the outcome. A rejected assumption becomes a change request; an unresolved one becomes a tracked risk.'}
+];
+
+/* ---------- seed data (clearly marked samples) ---------- */
+function seed(){
+  const team=[
+    {id:'m1',name:'Creative Director',role:'Head of Creative',color:'#0056B8'},
+    {id:'m2',name:'Production Lead',role:'Head of Production',color:'#C2410C'},
+    {id:'m3',name:'Office Admin',role:'Office Admin',color:'#1F8A5B'},
+    {id:'m4',name:'Producer',role:'Producer',color:'#7A4FD1'},
+    {id:'m5',name:'Editor',role:'Editor / Colorist',color:'#0FA3B1'},
+    {id:'m6',name:'Designer',role:'Graphic & Motion Designer',color:'#D64545'}
+  ];
+  const S={v:1,sample:true,me:'m1',team,projects:[],tasks:[],deliveries:[],assumptions:[],activity:[],ui:{tab:{},collapsed:{},calMonth:null,filters:{}}};
+  const mk=(o)=>{const p=Object.assign({id:uid('p'),currency:'ETB',description:''},o);S.projects.push(p);return p};
+  const p1=mk({name:'Women in Agribusiness documentary',client:'Sample NGO client',type:'Documentary',status:'On track',lead:'m1',start:addDays(-24),due:addDays(26),budget:850000,color:'#0056B8',description:'12-minute impact documentary with Amharic and English subtitles plus three social cutdowns. Dignity-first: participants co-develop their own stories.'});
+  const p2=mk({name:'Coffee brand launch campaign',client:'Sample FMCG client',type:'Commercial',status:'At risk',lead:'m2',start:addDays(-14),due:addDays(11),budget:1400000,color:'#F4A200',description:'30s TVC, 15s and 6s cutdowns, key visual pack for outdoor and social.'});
+  const p3=mk({name:'Annual impact report 2026',client:'Sample foundation',type:'Design & Print',status:'On track',lead:'m6',start:addDays(-32),due:addDays(6),budget:420000,color:'#1F8A5B',description:'48-page bilingual report with infographics, print and accessible web PDF.'});
+  const p4=mk({name:'Social retainer – December',client:'Sample hospitality client',type:'Social & Digital',status:'Not started',lead:'m4',start:addDays(18),due:addDays(48),budget:180000,color:'#FF6B6B',description:'Monthly content calendar, 2 shoot days, 24 posts, 8 reels, monthly report.'});
+  [p1,p2,p3,p4].forEach(p=>applyTemplate(S,p,true));
+  // nudge some statuses for realism
+  const t=S.tasks;
+  const find=(p,title)=>t.find(x=>x.projectId===p.id&&x.title.startsWith(title));
+  const fs=find(p2,'Storyboard');if(fs){fs.status='doing';fs.due=addDays(-2)}
+  const sd=find(p2,'Shoot day');if(sd){sd.status='todo';sd.due=addDays(1);sd.priority='High';sd.subtasks=[{t:'Confirm crew call sheet',d:true},{t:'Lock talent contracts',d:false},{t:'Camera & lighting prep',d:false}]}
+  const rc=find(p1,'Rough cut');if(rc){rc.status='review';rc.comments=[{who:'m1',at:addDays(-1)+' 16:20',text:'Opening is strong. Let Tigist speak first in the market scene before the music comes in.'}]}
+  const ly=find(p3,'Layout');if(ly){ly.status='doing'}
+  // deliveries
+  const dv=(p,o,stepsSigned,checked)=>{const d=Object.assign({id:uid('d'),projectId:p.id,status:'In QC',returns:[]},o);d.checks=QC.map((q,i)=>({items:q.items.map((_,j)=>i<stepsSigned||(i===stepsSigned&&j<(checked||0))),by:i<stepsSigned?(['m4','m5','m1','m4','m2'][i]):'',at:i<stepsSigned?addDays(-stepsSigned+i)+' 11:00':'',note:''}));if(stepsSigned>=5)d.status='Delivered';S.deliveries.push(d);return d};
+  dv(p1,{title:'Main documentary 12′ – EN/AM subtitles',spec:'ProRes 422 HQ master + H.264 1080p, 16:9, 25 fps, SRT ×2',due:addDays(24),owner:'m5'},1,3);
+  dv(p1,{title:'Social cutdowns 3 × 60s',spec:'9:16 and 1:1, H.264, burned-in captions',due:addDays(26),owner:'m5'},0,1);
+  dv(p2,{title:'TVC 30s broadcast master',spec:'ProRes 422 HQ, 1920×1080, -23 LUFS, clean + texted',due:addDays(10),owner:'m2'},3,2);
+  dv(p2,{title:'Key visual pack',spec:'Billboard 6×3 m CMYK PDF, social 1080×1350 PNG ×6',due:addDays(-3),owner:'m6'},5,0);
+  dv(p3,{title:'Print-ready PDF + accessible web PDF',spec:'PDF/X-4 with 3 mm bleed; tagged PDF/UA for web',due:addDays(6),owner:'m6'},2,2);
+  // assumptions
+  const as=(p,o)=>S.assumptions.push(Object.assign({id:uid('a'),projectId:p.id,category:'Scope',text:'',evidence:'',confidence:'',ifWrong:'',impact:0,likelihood:0,owner:'',method:'',by:'',outcome:'',outcomeNote:'',decidedBy:'',decidedAt:''},o));
+  as(p1,{category:'Logistics',text:'We assume field access to the two cooperative sites in Oromia is arranged by the client\'s regional office.',evidence:'Kick-off call notes; not yet in writing',confidence:'To confirm',ifWrong:'Shoot slips 1–2 weeks; travel re-booking costs.',impact:4,likelihood:3,owner:'m2',method:'Request written access letter from client programme manager',by:addDays(-1)});
+  as(p1,{category:'Rights & consent',text:'We assume all featured participants are adults and can give informed consent in Afaan Oromo.',evidence:'Participant list from client',confidence:'Verified',ifWrong:'Need guardian consent and identity protection; re-edit scenes.',impact:5,likelihood:1,owner:'m4',method:'Consent session with translator on day 1',by:addDays(-6),outcome:'Confirmed',outcomeNote:'Signed consent forms filed in project drive.',decidedBy:'m4',decidedAt:addDays(-5)+' 15:10'});
+  as(p2,{category:'Scope',text:'We assume two rounds of consolidated feedback are included.',evidence:'Quotation v2, clause 4',confidence:'Verified',ifWrong:'Unpaid extra revision rounds erode margin.',impact:3,likelihood:4,owner:'m3',method:'Confirm in signed PO',by:addDays(2)});
+  as(p2,{category:'Rights & consent',text:'We assume the music track is licensed for TV and social in Ethiopia for 12 months.',evidence:'',confidence:'',ifWrong:'',impact:0,likelihood:0});
+  as(p3,{category:'Client',text:'We assume final copy in both languages arrives by 10 Nov.',evidence:'Client email 22 Oct',confidence:'To confirm',ifWrong:'Print slot missed; printer rebooking fee.',impact:4,likelihood:4,owner:'m6',method:'Daily check-in with client comms lead',by:addDays(3)});
+  S.activity=[
+    {at:addDays(0)+' 09:12',who:'m5',text:'checked 3 of 5 items in Technical QC on “Main documentary 12′”'},
+    {at:addDays(-1)+' 16:20',who:'m1',text:'commented on “Rough cut”'},
+    {at:addDays(-1)+' 10:05',who:'m2',text:'signed off step 3 (Editorial & factual) on “TVC 30s broadcast master”'},
+    {at:addDays(-3)+' 14:40',who:'m2',text:'marked “Key visual pack” as delivered'}
+  ];
+  return S;
+}
+function applyTemplate(S,p,seeding){
+  const tpl=TEMPLATES[p.type]||TEMPLATES['Documentary'];
+  const dur=Math.max(7,diff(p.due,p.start));
+  const perPhase={};tpl.forEach(([ph])=>perPhase[ph]=(perPhase[ph]||0)+1);
+  const seen={};
+  const roleFor=ph=>({0:p.lead,1:'m4',2:'m2',3:p.type==='Design & Print'?'m6':'m5',4:'m3',5:p.lead,6:'m2'}[ph]);
+  tpl.forEach(([ph,title])=>{
+    seen[ph]=(seen[ph]||0)+1;
+    const frac=(ph+seen[ph]/(perPhase[ph]+0.0001)*0.95)/PHASES.length;
+    const due=addDays(Math.round(dur*frac),p.start);
+    const start=addDays(-Math.max(1,Math.round(dur/12)),due);
+    let status='todo';
+    if(seeding){const n=fromToday(due);if(n<-1)status='done';else if(n<4&&fromToday(start)<=0)status='doing'}
+    S.tasks.push({id:uid('t'),projectId:p.id,title,phase:ph,assignee:S.team.find(m=>m.id===roleFor(ph))?roleFor(ph):(S.team[0]||{}).id,start,due,priority:ph===2||ph===6?'High':'Medium',status,subtasks:[],comments:[],notes:''});
+  });
+}
+
+/* ---------- storage ---------- */
+const KEY='youthopians-studio-v1';
+let S;
+try{const raw=localStorage.getItem(KEY);S=raw?JSON.parse(raw):null}catch(e){S=null}
+if(!S||!S.team)S=seed();
+S.ui=S.ui||{tab:{},collapsed:{},filters:{}};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function log(text){S.activity.unshift({at:nowStamp(),who:S.me,text});S.activity=S.activity.slice(0,200)}
+
+/* ---------- lookups ---------- */
+const P=id=>S.projects.find(p=>p.id===id);
+const M=id=>S.team.find(m=>m.id===id);
+const T=id=>S.tasks.find(t=>t.id===id);
+const D=id=>S.deliveries.find(d=>d.id===id);
+const A=id=>S.assumptions.find(a=>a.id===id);
+const initials=n=>(n||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const av=id=>{const m=M(id);return m?`<span class="av" style="background:${m.color}" title="${esc(m.name)}">${esc(initials(m.name))}</span>`:`<span class="av" style="background:var(--faint)" title="Unassigned">–</span>`};
+const dueHtml=(s,done)=>{if(!s)return '<span class="due">No date</span>';const n=fromToday(s);const c=done?'':(n<0?'late':n<=2?'soon':'');return `<span class="due ${c}">${esc(rel(s))}</span>`};
+const pill=(txt,cls)=>`<span class="pill ${cls}">${esc(txt)}</span>`;
+const statusPill=s=>pill(STATUSES.find(x=>x[0]===s)[1],{todo:'s-idle',doing:'s-blue',review:'s-warn',done:'s-ok'}[s]);
+const openTasks=f=>S.tasks.filter(t=>t.status!=='done'&&(!f||f(t)));
+const isLate=t=>t.status!=='done'&&t.due&&fromToday(t.due)<0;
+
+/* delivery helpers */
+const qcStep=d=>{for(let i=0;i<5;i++)if(!d.checks[i].by)return i;return 5};
+const qcLabel=d=>{if(d.status==='Delivered')return['Delivered','s-ok'];const s=qcStep(d);if(d.returned)return['Returned · step '+(s+1),'s-bad'];if(s===5)return['Ready to deliver','s-blue'];return['Step '+(s+1)+' · '+QC[s].name,'s-warn']};
+const qcDots=d=>{const s=d.status==='Delivered'?5:qcStep(d);return '<span class="steps5" title="5-step delivery check">'+QC.map((q,i)=>`<i class="${i<s?'done':i===s?(d.returned?'ret':'cur'):''}">${i+1}</i>`).join('')+'</span>'};
+/* assumption helpers */
+const aDone=a=>[!!a.text.trim(),!!(a.evidence.trim()&&a.confidence),!!(a.ifWrong.trim()&&a.impact&&a.likelihood),!!(a.owner&&a.method.trim()&&a.by),!!a.outcome];
+const aStep=a=>{const d=aDone(a);const i=d.indexOf(false);return i<0?5:i};
+const aDots=a=>{const d=aDone(a),s=aStep(a);return '<span class="steps5" title="5-step assumption check">'+d.map((x,i)=>`<i class="${x?'done':i===s?'cur':''}">${i+1}</i>`).join('')+'</span>'};
+const riskScore=a=>(a.impact||0)*(a.likelihood||0);
+const riskChip=a=>{const r=riskScore(a);if(!r)return '<span class="risk s-idle">–</span>';const c=r>=15?'s-bad':r>=8?'s-warn':'s-ok';return `<span class="risk ${c}" title="Impact ${a.impact} × likelihood ${a.likelihood}">${r}</span>`};
+const aOverdue=a=>!a.outcome&&a.by&&fromToday(a.by)<0;
+const aState=a=>{if(a.outcome==='Confirmed')return pill('Confirmed','s-ok');if(a.outcome)return pill(a.outcome.startsWith('Rejected')?'Change request':'Tracked risk','s-bad');if(aOverdue(a))return pill('Validation overdue','s-bad');return pill('Step '+(aStep(a)+1)+' · '+ASTEPS[aStep(a)].name,'s-warn')};
+
+/* ---------- icons ---------- */
+const I={
+ home:'<path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z"/>',
+ me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',
+ cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+ box:'<path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/>',
+ bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>',
+ team:'<circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20c.8-3.5 3.6-5.5 7-5.5s6.2 2 7 5.5M16 14.5c2.8 0 5 1.8 5.6 4.5"/>'
+};
+const ico=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${I[k]}</svg>`;
+
+/* ---------- routing ---------- */
+const RESERVED=['settings','sidebar','customize','upgrade','downloads'];
+function route(){const h=(location.hash||'').slice(1);if(!h||RESERVED.includes(h))return{name:'home'};if(h.startsWith('project-'))return{name:'project',id:h.slice(8)};return{name:h}}
+function go(h){if(location.hash==='#'+h)render();else location.hash=h}
+window.addEventListener('hashchange',()=>{closeDrawer(true);render();document.getElementById('side').classList.remove('open')});
+
+/* ---------- render: sidebar ---------- */
+function renderSide(){
+  const r=route();
+  const mine=openTasks(t=>t.assignee===S.me).length;
+  const qc=S.deliveries.filter(d=>d.status!=='Delivered').length;
+  const asum=S.assumptions.filter(a=>!a.outcome).length;
+  const link=(h,icon,label,count)=>`<a href="#${h}" class="${(r.name===h)?'on':''}">${ico(icon)}<span>${label}</span>${count?`<span class="count num">${count}</span>`:''}</a>`;
+  const projs=S.projects.filter(p=>p.status!=='Complete');
+  const done=S.projects.filter(p=>p.status==='Complete');
+  document.getElementById('side').innerHTML=`
+    <div class="brand"><div class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div><b>Youthopians</b><span>STUDIO · PROJECT DESK</span></div></div>
+    <div class="who"><label for="meSel">Working as</label><select id="meSel" data-f="me">${S.team.map(m=>`<option value="${m.id}" ${m.id===S.me?'selected':''}>${esc(m.name)} · ${esc(m.role)}</option>`).join('')}</select></div>
+    <nav class="nav">
+      ${link('home','home','Home')}
+      ${link('my-tasks','me','My tasks',mine)}
+      ${link('calendar','cal','Calendar')}
+      ${link('deliveries','box','Delivery checks',qc)}
+      ${link('assumptions','bulb','Assumptions',asum)}
+      ${link('team','team','Team')}
+    </nav>
+    <nav class="nav">
+      <div class="nav-h"><span>Projects</span><button data-act="new-project" aria-label="New project" title="New project">+</button></div>
+      ${projs.map(p=>`<a href="#project-${p.id}" class="${r.name==='project'&&r.id===p.id?'on':''}"><span class="dot" style="background:${p.color}"></span><span class="pname">${esc(p.name)}</span></a>`).join('')||'<div class="small" style="opacity:.7;padding:4px 8px">No active projects</div>'}
+      ${done.length?`<div class="nav-h"><span>Completed</span></div>`+done.map(p=>`<a href="#project-${p.id}" class="${r.name==='project'&&r.id===p.id?'on':''}"><span class="dot" style="background:${p.color};opacity:.5"></span><span class="pname">${esc(p.name)}</span></a>`).join(''):''}
+    </nav>
+    <div class="side-foot">
+      <button data-act="theme">Theme</button><button data-act="export">Export</button><button data-act="import">Import</button><button data-act="reset">Reset</button>
+    </div>
+    <div class="tagline"><i></i>Stories that move</div>`;
+}
+
+/* ---------- render: views ---------- */
+function render(){
+  renderSide();
+  const r=route(),v=document.getElementById('view');
+  let html='';
+  if(r.name==='project'){const p=P(r.id);html=p?viewProject(p):viewHome()}
+  else html=({'my-tasks':viewMyTasks,'calendar':()=>viewCalendar(null),'deliveries':()=>viewDeliveries(null),'assumptions':()=>viewAssumptions(null),'team':viewTeam}[r.name]||viewHome)();
+  v.innerHTML=`<div class="wrap">${html}</div>`;
+  if(drawerState)renderDrawer();
+}
+
+function sampleBanner(){return S.sample?`<div class="callout"><b>You are looking at sample projects.</b> Rename the team under Team, then add your own projects. Choose <b>Reset</b> → <b>Start empty</b> in the sidebar to clear the examples.</div>`:''}
+
+function viewHome(){
+  const me=M(S.me)||{name:'there'};
+  const late=S.tasks.filter(isLate);
+  const week=openTasks(t=>t.due&&fromToday(t.due)>=0&&fromToday(t.due)<=7).sort((a,b)=>a.due.localeCompare(b.due));
+  const inQC=S.deliveries.filter(d=>d.status!=='Delivered');
+  const openA=S.assumptions.filter(a=>!a.outcome);
+  const hiRisk=openA.filter(a=>riskScore(a)>=12||aOverdue(a));
+  const h=new Date().getHours();
+  const greet=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  const act=S.projects.filter(p=>p.status!=='Complete');
+  return `${sampleBanner()}
+  <div class="page-h"><div class="grow"><div class="eyebrow">${esc(fmt(ymd(TODAY)))} · ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][TODAY.getDay()]}</div><h1>${greet}, ${esc(me.name)}</h1><p>${act.length} active projects, ${openTasks().length} open tasks and ${inQC.length} deliverables moving through the 5-step check.</p></div></div>
+  <div class="kpis">
+    <button class="kpi ${late.length?'alert':''}" data-go="my-tasks"><span class="eyebrow">Overdue tasks</span><b class="num">${late.length}</b><span class="small muted">across all projects</span></button>
+    <button class="kpi" data-go="calendar"><span class="eyebrow">Due in 7 days</span><b class="num">${week.length}</b><span class="small muted">tasks</span></button>
+    <button class="kpi" data-go="deliveries"><span class="eyebrow">In delivery check</span><b class="num">${inQC.length}</b><span class="small muted">${S.deliveries.filter(d=>d.status!=='Delivered'&&qcStep(d)===5).length} ready to deliver</span></button>
+    <button class="kpi ${hiRisk.length?'alert':''}" data-go="assumptions"><span class="eyebrow">Open assumptions</span><b class="num">${openA.length}</b><span class="small muted">${hiRisk.length} high-risk or overdue</span></button>
+  </div>
+  <div class="cols">
+    <div class="panel c8"><div class="panel-h"><span class="sq"></span><h3>Project health</h3></div>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Project</th><th>Status</th><th>Lead</th><th>Progress</th><th>Due</th></tr></thead><tbody>
+      ${act.map(p=>{const ts=S.tasks.filter(t=>t.projectId===p.id),d=ts.filter(t=>t.status==='done').length,pc=ts.length?Math.round(d/ts.length*100):0;return `<tr class="click" data-go="project-${p.id}"><td><div style="display:flex;gap:8px;align-items:center"><span class="dot" style="width:10px;height:10px;border-radius:3px;background:${p.color};flex:none"></span><div style="min-width:0"><div style="font-weight:600">${esc(p.name)}</div><div class="small muted">${esc(p.client)} · ${esc(p.type)}</div></div></div></td><td>${pill(p.status,PSTAT[p.status])}</td><td>${av(p.lead)}</td><td style="min-width:120px"><div class="bar-meter"><i style="width:${pc}%;background:var(--blue)"></i></div><span class="small muted num">${d}/${ts.length} tasks</span></td><td>${dueHtml(p.due)}</td></tr>`}).join('')||'<tr><td colspan="5" class="empty">No active projects.</td></tr>'}
+      </tbody></table></div></div>
+    <div class="panel c4"><div class="panel-h"><span class="sq"></span><h3>Needs attention</h3></div><div class="panel-b"><div class="list-plain">
+      ${late.slice(0,4).map(t=>`<button data-act="open-task" data-id="${t.id}"><span class="pill s-bad">Late</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.title)}</span>${av(t.assignee)}</button>`).join('')}
+      ${hiRisk.slice(0,3).map(a=>`<button data-act="open-assumption" data-id="${a.id}">${riskChip(a)}<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.text||'Untitled assumption')}</span></button>`).join('')}
+      ${inQC.filter(d=>d.due&&fromToday(d.due)<=7).slice(0,3).map(d=>`<button data-act="open-delivery" data-id="${d.id}">${qcDots(d)}<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.title)}</span>${dueHtml(d.due)}</button>`).join('')}
+      ${(!late.length&&!hiRisk.length)?'<div class="empty">Nothing urgent. Good week.</div>':''}
+    </div></div></div>
+    <div class="panel c7"><div class="panel-h"><span class="sq"></span><h3>Due this week</h3></div><div class="panel-b"><div class="list-plain">
+      ${week.slice(0,8).map(t=>`<button data-act="open-task" data-id="${t.id}"><span class="dot" style="width:8px;height:8px;border-radius:2px;background:${(P(t.projectId)||{}).color};flex:none"></span><span style="flex:1;min-width:0"><span style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.title)}</span><span class="small muted">${esc((P(t.projectId)||{}).name||'')} · ${PHASES[t.phase]}</span></span>${dueHtml(t.due)}${av(t.assignee)}</button>`).join('')||'<div class="empty">No tasks due in the next 7 days.</div>'}
+    </div></div></div>
+    <div class="panel c5"><div class="panel-h"><span class="sq"></span><h3>Activity</h3></div><div class="panel-b"><div class="feed">
+      ${S.activity.slice(0,8).map(a=>`<div>${av(a.who)}<span><b>${esc((M(a.who)||{}).name||'Someone')}</b> ${esc(a.text)}</span><time>${esc(a.at.slice(5))}</time></div>`).join('')||'<div class="empty">No activity yet.</div>'}
+    </div></div></div>
+  </div>`;
+}
+
+function viewMyTasks(){
+  const mine=S.tasks.filter(t=>t.assignee===S.me);
+  const groups=[['Overdue',t=>isLate(t)],['Today',t=>t.status!=='done'&&fromToday(t.due)===0],['Next 7 days',t=>t.status!=='done'&&fromToday(t.due)>0&&fromToday(t.due)<=7],['Later',t=>t.status!=='done'&&(fromToday(t.due)>7)],['No date',t=>t.status!=='done'&&!t.due],['Recently completed',t=>t.status==='done']];
+  const me=M(S.me);
+  return `<div class="page-h"><div class="grow"><div class="eyebrow">${esc(me?me.role:'')}</div><h1>My tasks</h1><p>Everything assigned to ${esc(me?me.name:'you')}, across every project. Switch person under “Working as”.</p></div></div>
+  ${groups.map(([g,f],gi)=>{let ts=mine.filter(f).sort((a,b)=>(a.due||'9').localeCompare(b.due||'9'));if(gi===5)ts=ts.slice(-6).reverse();if(!ts.length)return '';return `<div class="phase"><div class="phase-h"><h3>${g}</h3><span class="cnt num">${ts.length}</span></div><div class="phase-list">${ts.map(t=>taskRow(t,true)).join('')}</div></div>`}).join('')||'<div class="panel empty">No tasks assigned to you. Pick a task and set yourself as assignee.</div>'}`;
+}
+
+function taskRow(t,showProject){
+  const p=P(t.projectId)||{};const sub=t.subtasks.length?` <span class="tag num">${t.subtasks.filter(s=>s.d).length}/${t.subtasks.length}</span>`:'';
+  const cm=t.comments.length?` <span class="tag num">💬 ${t.comments.length}</span>`:'';
+  return `<div class="trow ${t.status==='done'?'done':''}" data-act="open-task" data-id="${t.id}">
+    <button class="chk ${t.status==='done'?'on':''}" data-act="toggle-done" data-id="${t.id}" aria-label="Mark complete"></button>
+    <span class="title">${esc(t.title)}${sub}${cm}${showProject?` <span class="small muted">· ${esc(p.name||'')}</span>`:''}</span>
+    <span class="hide-sm">${statusPill(t.status)}</span>
+    <span class="hide-sm prio ${t.priority}">${t.priority}</span>
+    ${dueHtml(t.due,t.status==='done')}
+    <span class="hide-sm" style="display:flex;justify-content:flex-end">${av(t.assignee)}</span>
+  </div>`;
+}
+
+function viewProject(p){
+  const tab=S.ui.tab[p.id]||'list';
+  const ts=S.tasks.filter(t=>t.projectId===p.id);
+  const tabs=[['overview','Overview'],['list','List'],['board','Board'],['timeline','Timeline'],['calendar','Calendar'],['deliveries','Delivery checks'],['assumptions','Assumptions']];
+  let body='';
+  if(tab==='overview')body=projOverview(p,ts);
+  else if(tab==='list')body=projList(p,ts);
+  else if(tab==='board')body=projBoard(p,ts);
+  else if(tab==='timeline')body=projTimeline(p,ts);
+  else if(tab==='calendar')body=viewCalendar(p);
+  else if(tab==='deliveries')body=viewDeliveries(p);
+  else body=viewAssumptions(p);
+  return `<div class="page-h">
+    <div class="grow"><div class="eyebrow">${esc(p.client)} · ${esc(p.type)}</div><h1 style="display:flex;align-items:center;gap:10px"><span style="width:16px;height:16px;background:${p.color};flex:none"></span>${esc(p.name)}</h1>
+      <p class="num">${fmt(p.start)} → ${fmt(p.due)} · Lead ${esc((M(p.lead)||{}).name||'—')} · Budget ${esc(money(p.budget,p.currency))}</p></div>
+    <select class="field" style="width:auto" data-f="project.status" data-id="${p.id}" aria-label="Project status">${Object.keys(PSTAT).map(s=>`<option ${s===p.status?'selected':''}>${s}</option>`).join('')}</select>
+    <button class="btn" data-act="edit-project" data-id="${p.id}">Edit project</button>
+  </div>
+  <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button class="${tab===k?'on':''}" data-act="tab" data-id="${p.id}" data-tab="${k}" role="tab">${l}</button>`).join('')}</div>
+  ${body}`;
+}
+
+function projOverview(p,ts){
+  const d=ts.filter(t=>t.status==='done').length;
+  const dl=S.deliveries.filter(x=>x.projectId===p.id);
+  const as=S.assumptions.filter(x=>x.projectId===p.id);
+  const byPhase=PHASES.map((ph,i)=>{const x=ts.filter(t=>t.phase===i);return{ph,i,n:x.length,d:x.filter(t=>t.status==='done').length}}).filter(x=>x.n);
+  const gaps=[];
+  const und=dl.filter(x=>x.status!=='Delivered');if(und.length)gaps.push(`${und.length} deliverable(s) have not passed all 5 checks`);
+  const ua=as.filter(a=>!a.outcome);if(ua.length)gaps.push(`${ua.length} assumption(s) are not decided and logged`);
+  const ot=ts.filter(t=>t.status!=='done');if(ot.length)gaps.push(`${ot.length} task(s) still open`);
+  return `<div class="cols">
+   <div class="panel c8"><div class="panel-h"><span class="sq"></span><h3>Brief</h3></div><div class="panel-b">
+     <p style="margin:0 0 14px;max-width:68ch">${esc(p.description||'No description yet. Use Edit project to add the brief.')}</p>
+     <div class="eyebrow" style="margin-bottom:8px">Progress by production phase</div>
+     <div style="display:flex;flex-direction:column;gap:8px">${byPhase.map(x=>`<div style="display:grid;grid-template-columns:150px 1fr 54px;gap:10px;align-items:center"><span class="small"><b class="num" style="color:var(--amber)">${x.i+1}</b> ${x.ph}</span><div class="bar-meter"><i style="width:${x.d/x.n*100}%;background:${x.d===x.n?'var(--ok)':'var(--blue)'}"></i></div><span class="small muted num">${x.d}/${x.n}</span></div>`).join('')}</div>
+   </div></div>
+   <div class="panel c4"><div class="panel-h"><span class="sq"></span><h3>Close-out readiness</h3></div><div class="panel-b" style="display:flex;flex-direction:column;gap:10px">
+     ${gaps.length?`<div class="callout bad">This project cannot be closed yet:<ul style="margin:6px 0 0;padding-left:18px">${gaps.map(g=>`<li>${g}</li>`).join('')}</ul></div>`:`<div class="callout ok">All deliverables passed the 5-step check and every assumption is logged. Ready to close.</div>`}
+     <div class="small muted num">${d}/${ts.length} tasks · ${dl.length-und.length}/${dl.length} delivered · ${as.length-ua.length}/${as.length} assumptions logged</div>
+     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" data-act="new-delivery" data-id="${p.id}">+ Deliverable</button><button class="btn sm" data-act="new-assumption" data-id="${p.id}">+ Assumption</button></div>
+   </div></div>
+  </div>`;
+}
+
+function projList(p,ts){
+  return PHASES.map((ph,i)=>{
+    const x=ts.filter(t=>t.phase===i);const key=p.id+':'+i;const col=S.ui.collapsed[key];
+    return `<div class="phase"><div class="phase-h" data-act="collapse" data-id="${key}"><span class="n">${i+1}</span><h3>${ph}</h3><span class="cnt num">${x.filter(t=>t.status==='done').length}/${x.length}</span><span class="muted small" style="margin-left:auto">${col?'Show':'Hide'}</span></div>
+      ${col?'':`<div class="phase-list">${x.map(t=>taskRow(t)).join('')}<form class="addrow" data-form="quick-add" data-id="${p.id}" data-phase="${i}"><span class="muted">+</span><input id="qa-${p.id}-${i}" name="title" placeholder="Add a task to ${ph}…" aria-label="Add a task to ${ph}"></form></div>`}</div>`;
+  }).join('');
+}
+
+function projBoard(p,ts){
+  return `<div class="board">${STATUSES.map(([k,l])=>{const x=ts.filter(t=>t.status===k);return `<div class="col" data-drop="${k}"><div class="col-h"><h3>${l}</h3><span class="muted small num">${x.length}</span></div>
+    ${x.map(t=>`<div class="card" draggable="true" data-drag="${t.id}" data-act="open-task" data-id="${t.id}"><span class="eyebrow" style="color:var(--blue)">${PHASES[t.phase]}</span><span style="font-weight:600">${esc(t.title)}</span><div class="meta"><span class="prio ${t.priority}">${t.priority}</span>${dueHtml(t.due,t.status==='done')}${av(t.assignee)}</div></div>`).join('')}
+    <button class="btn ghost sm" data-act="new-task" data-id="${p.id}" data-status="${k}">+ Add task</button></div>`}).join('')}</div>`;
+}
+
+function projTimeline(p,ts){
+  const dl=S.deliveries.filter(d=>d.projectId===p.id);
+  let s=p.start,e=p.due;
+  ts.forEach(t=>{if(t.start&&t.start<s)s=t.start;if(t.due&&t.due>e)e=t.due});
+  s=addDays(-2,s);e=addDays(3,e);
+  const span=Math.max(1,diff(e,s));
+  const x=d=>Math.max(0,Math.min(100,diff(d,s)/span*100));
+  const weeks=[];let w=parse(s);w.setDate(w.getDate()-((w.getDay()+6)%7));
+  while(ymd(w)<=e){weeks.push(ymd(w));w.setDate(w.getDate()+7)}
+  const head=weeks.map(wk=>{const l=x(wk),r=x(addDays(7,wk));if(r-l<4)return '';return `<div style="position:absolute;left:${l}%;width:${r-l}%;border-left:1px solid var(--line);padding:6px 4px;font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden">${fmt(wk)}</div>`}).join('');
+  const t0=x(ymd(TODAY));
+  const rows=PHASES.map((ph,i)=>{const pt=ts.filter(t=>t.phase===i);if(!pt.length)return '';
+    return `<div class="tl-row ph"><div class="lab">${i+1}. ${ph}</div><div class="tl-track"></div></div>`+pt.map(t=>{const a=x(t.start||t.due),b=x(t.due);const cls=t.status==='done'?'done':isLate(t)?'late':t.status==='review'?'review':'';return `<div class="tl-row"><div class="lab" data-act="open-task" data-id="${t.id}">${esc(t.title)}</div><div class="tl-track"><div class="bar ${cls}" style="left:${a}%;width:${Math.max(.8,b-a)}%" data-act="open-task" data-id="${t.id}" title="${esc(t.title)} · ${fmt(t.start)} → ${fmt(t.due)}"></div></div></div>`}).join('')}).join('');
+  const dlr=dl.length?`<div class="tl-row ph"><div class="lab">Deliverables</div><div class="tl-track"></div></div>`+dl.map(d=>`<div class="tl-row"><div class="lab" data-act="open-delivery" data-id="${d.id}">◆ ${esc(d.title)}</div><div class="tl-track"><div class="bar dl" style="left:calc(${x(d.due)}% - 7px)" data-act="open-delivery" data-id="${d.id}" title="${esc(d.title)} · due ${fmt(d.due)}"></div></div></div>`).join(''):'';
+  return `<div class="filters small muted"><span><span class="pill s-blue">Planned</span></span><span class="pill s-warn">In review</span><span class="pill s-ok">Done</span><span class="pill s-bad">Late</span><span>◆ deliverable due · red line = today</span></div>
+  <div class="tbl-wrap panel" style="padding:0 12px 8px"><div class="tl">
+    <div style="display:grid;grid-template-columns:220px 1fr;position:sticky;top:0;background:var(--surface);z-index:2;border-bottom:1px solid var(--line)"><div class="eyebrow" style="padding:8px 0">Task</div><div style="position:relative;height:30px">${head}</div></div>
+    <div style="position:relative"><div style="position:absolute;left:220px;right:0;top:0;bottom:0;pointer-events:none"><div class="today-line" style="left:${t0}%"></div></div>${rows}${dlr}</div>
+  </div></div>`;
+}
+
+function viewCalendar(p){
+  const cm=S.ui.calMonth||ymd(new Date(TODAY.getFullYear(),TODAY.getMonth(),1));
+  const first=parse(cm);const y=first.getFullYear(),m=first.getMonth();
+  const start=new Date(y,m,1);start.setDate(1-((start.getDay()+6)%7));
+  const ts=S.tasks.filter(t=>!p||t.projectId===p.id);
+  const dl=S.deliveries.filter(d=>!p||d.projectId===p.id);
+  let cells='';
+  for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=ymd(d);
+    const evs=ts.filter(t=>t.due===k).map(t=>`<button class="ev ${t.status==='done'?'done':''}" style="background:${(P(t.projectId)||{}).color||'var(--blue)'}" data-act="open-task" data-id="${t.id}" title="${esc(t.title)}">${esc(t.title)}</button>`)
+      .concat(dl.filter(x=>x.due===k).map(x=>`<button class="ev dl" data-act="open-delivery" data-id="${x.id}" title="Deliverable: ${esc(x.title)}">◆ ${esc(x.title)}</button>`));
+    const more=evs.length>4?`<span class="small muted">+${evs.length-4} more</span>`:'';
+    cells+=`<div class="day ${d.getMonth()!==m?'out':''} ${k===ymd(TODAY)?'today':''}"><span class="dn num">${d.getDate()}</span>${evs.slice(0,4).join('')}${more}</div>`;
+    if(i>=34&&d.getMonth()!==m&&i%7===6)break;
+  }
+  const head=p?'':`<div class="page-h"><div class="grow"><div class="eyebrow">All projects</div><h1>Calendar</h1><p>Task due dates in project colours. Amber diamonds are deliverables.</p></div></div>`;
+  return `${head}<div class="filters"><button class="btn sm" data-act="cal" data-d="-1" aria-label="Previous month">‹</button><h2 style="min-width:170px;text-align:center">${['January','February','March','April','May','June','July','August','September','October','November','December'][m]} ${y}</h2><button class="btn sm" data-act="cal" data-d="1" aria-label="Next month">›</button><button class="btn sm ghost" data-act="cal" data-d="0">Today</button></div>
+  <div class="tbl-wrap"><div class="cal" style="min-width:640px">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>`<div class="dow">${x}</div>`).join('')}${cells}</div></div>`;
+}
+
+function viewDeliveries(p){
+  const f=S.ui.filters.dl||'open';
+  let ds=S.deliveries.filter(d=>!p||d.projectId===p.id);
+  if(f==='open')ds=ds.filter(d=>d.status!=='Delivered');else if(f==='done')ds=ds.filter(d=>d.status==='Delivered');
+  ds.sort((a,b)=>(a.due||'9').localeCompare(b.due||'9'));
+  const head=p?'':`<div class="page-h"><div class="grow"><div class="eyebrow">Quality gate</div><h1>Delivery checks</h1><p>No deliverable leaves Youthopians until it passes all five steps, in order, each signed off by a named person.</p></div></div>`;
+  return `${head}
+  <div class="panel"><div class="panel-b legend5" id="qc-legend">${QC.map((q,i)=>`<div style="display:flex;gap:8px;align-items:flex-start;min-width:0"><span class="steps5"><i class="cur">${i+1}</i></span><div style="min-width:0"><div style="font-weight:700;font-size:.88rem">${q.name}</div><div class="small muted">${q.owner} · ${q.items.length} checks</div></div></div>`).join('')}</div></div>
+  <div class="filters"><select class="field" data-f="filter.dl" aria-label="Filter deliverables"><option value="open" ${f==='open'?'selected':''}>In progress</option><option value="done" ${f==='done'?'selected':''}>Delivered</option><option value="all" ${f==='all'?'selected':''}>All</option></select>
+    <button class="btn primary sm" data-act="new-delivery" data-id="${p?p.id:''}" style="margin-left:auto">+ New deliverable</button></div>
+  <div class="panel tbl-wrap"><table class="tbl"><thead><tr><th>Deliverable</th>${p?'':'<th>Project</th>'}<th>5-step check</th><th>Status</th><th>Owner</th><th>Due</th></tr></thead><tbody>
+  ${ds.map(d=>{const [l,c]=qcLabel(d);return `<tr class="click" data-act="open-delivery" data-id="${d.id}"><td><div style="font-weight:600">${esc(d.title)}</div><div class="small muted">${esc(d.spec||'')}</div></td>${p?'':`<td class="small">${esc((P(d.projectId)||{}).name||'')}</td>`}<td>${qcDots(d)}</td><td>${pill(l,c)}</td><td>${av(d.owner)}</td><td>${dueHtml(d.due,d.status==='Delivered')}</td></tr>`}).join('')||`<tr><td colspan="6" class="empty">No deliverables here yet. Add one to start its 5-step check.</td></tr>`}
+  </tbody></table></div>`;
+}
+
+function viewAssumptions(p){
+  const f=S.ui.filters.as||'open';
+  let as=S.assumptions.filter(a=>!p||a.projectId===p.id);
+  if(f==='open')as=as.filter(a=>!a.outcome);else if(f==='done')as=as.filter(a=>a.outcome);
+  as.sort((a,b)=>riskScore(b)-riskScore(a));
+  const head=p?'':`<div class="page-h"><div class="grow"><div class="eyebrow">Assumptions register</div><h1>Assumptions</h1><p>Every quote, plan and schedule rests on assumptions. Each one goes through five steps until it is confirmed, turned into a change request, or tracked as a risk.</p></div></div>`;
+  return `${head}
+  <div class="panel"><div class="panel-b legend5" id="as-legend">${ASTEPS.map((q,i)=>`<div style="display:flex;gap:8px;align-items:flex-start;min-width:0"><span class="steps5"><i class="cur">${i+1}</i></span><div style="min-width:0"><div style="font-weight:700;font-size:.88rem">${q.name}</div><div class="small muted">${q.hint}</div></div></div>`).join('')}</div></div>
+  <div class="filters"><select class="field" data-f="filter.as" aria-label="Filter assumptions"><option value="open" ${f==='open'?'selected':''}>Open</option><option value="done" ${f==='done'?'selected':''}>Decided</option><option value="all" ${f==='all'?'selected':''}>All</option></select>
+    <span class="small muted">Risk = impact × likelihood (1–25)</span>
+    <button class="btn primary sm" data-act="new-assumption" data-id="${p?p.id:''}" style="margin-left:auto">+ New assumption</button></div>
+  <div class="panel tbl-wrap"><table class="tbl"><thead><tr><th>Risk</th><th>Assumption</th>${p?'':'<th>Project</th>'}<th>5-step check</th><th>State</th><th>Owner</th><th>Validate by</th></tr></thead><tbody>
+  ${as.map(a=>`<tr class="click" data-act="open-assumption" data-id="${a.id}"><td>${riskChip(a)}</td><td style="max-width:420px"><div>${esc(a.text||'Untitled assumption')}</div><div class="small muted">${esc(a.category)}${a.confidence?' · '+esc(a.confidence):''}</div></td>${p?'':`<td class="small">${esc((P(a.projectId)||{}).name||'')}</td>`}<td>${aDots(a)}</td><td>${aState(a)}</td><td>${a.owner?av(a.owner):'<span class="muted">—</span>'}</td><td>${a.by?dueHtml(a.by,!!a.outcome):'<span class="muted">—</span>'}</td></tr>`).join('')||`<tr><td colspan="7" class="empty">No assumptions here. Log the first one before you send a quote.</td></tr>`}
+  </tbody></table></div>`;
+}
+
+function viewTeam(){
+  return `<div class="page-h"><div class="grow"><div class="eyebrow">People & workload</div><h1>Team</h1><p>Open work per person, so producers can rebalance before a shoot week.</p></div><button class="btn primary" data-act="new-member">+ Add member</button></div>
+  <div class="team-grid">${S.team.map(m=>{const o=openTasks(t=>t.assignee===m.id),l=o.filter(isLate).length,w=o.filter(t=>t.due&&fromToday(t.due)<=7).length;const qc=S.deliveries.filter(d=>d.owner===m.id&&d.status!=='Delivered').length;const max=12;
+    return `<div class="panel member"><div style="display:flex;gap:10px;align-items:center">${av(m.id).replace('class="av"','class="av" style="width:40px;height:40px;font-size:.85rem;background:'+m.color+'"')}<div style="min-width:0;flex:1"><div style="font-weight:700">${esc(m.name)}</div><div class="small muted">${esc(m.role)}</div></div><button class="btn sm ghost" data-act="edit-member" data-id="${m.id}">Edit</button></div>
+    <div><div class="bar-meter" title="${w} due within 7 days of ${o.length} open"><i style="width:${Math.min(100,w/max*100)}%;background:${w>8?'var(--coral)':'var(--blue)'}"></i><i style="width:${Math.min(100,(o.length-w)/max*100)}%;background:var(--line-strong)"></i></div></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center" class="num"><div><b style="font:700 1.3rem var(--f-head)">${o.length}</b><div class="small muted">Open</div></div><div><b style="font:700 1.3rem var(--f-head)">${w}</b><div class="small muted">7 days</div></div><div><b style="font:700 1.3rem var(--f-head);color:${l?'var(--coral)':'inherit'}">${l}</b><div class="small muted">Late</div></div><div><b style="font:700 1.3rem var(--f-head)">${qc}</b><div class="small muted">QC</div></div></div></div>`}).join('')}</div>`;
+}
+
+/* ---------- drawer ---------- */
+let drawerState=null;
+function openDrawer(kind,id){drawerState={kind,id};renderDrawer();document.getElementById('drawer').hidden=false;document.getElementById('scrim').hidden=false}
+function closeDrawer(silent){drawerState=null;document.getElementById('drawer').hidden=true;document.getElementById('scrim').hidden=true;if(!silent)render()}
+function renderDrawer(){
+  const el=document.getElementById('drawer');if(!drawerState){el.hidden=true;return}
+  const {kind,id}=drawerState;let html='';
+  if(kind==='task'){const t=T(id);if(!t)return closeDrawer();html=drawerTask(t)}
+  if(kind==='delivery'){const d=D(id);if(!d)return closeDrawer();html=drawerDelivery(d)}
+  if(kind==='assumption'){const a=A(id);if(!a)return closeDrawer();html=drawerAssumption(a)}
+  const sc=el.querySelector('.dr-b');const top=sc?sc.scrollTop:0;
+  el.innerHTML=html;const nb=el.querySelector('.dr-b');if(nb)nb.scrollTop=top;
+}
+const memberOpts=(sel,allowNone)=>(allowNone?`<option value="">Unassigned</option>`:'')+S.team.map(m=>`<option value="${m.id}" ${m.id===sel?'selected':''}>${esc(m.name)}</option>`).join('');
+const projOpts=sel=>S.projects.map(p=>`<option value="${p.id}" ${p.id===sel?'selected':''}>${esc(p.name)}</option>`).join('');
+
+function drawerTask(t){
+  const p=P(t.projectId)||{};
+  return `<div class="dr-h"><button class="btn sm ${t.status==='done'?'':'primary'}" data-act="toggle-done" data-id="${t.id}">${t.status==='done'?'Reopen':'✓ Mark complete'}</button><span class="small muted" style="margin-left:auto">${esc(p.name||'')}</span><button class="btn sm ghost" data-act="del-task" data-id="${t.id}">Delete</button><button class="btn sm ghost" data-act="close-drawer" aria-label="Close">✕</button></div>
+  <div class="dr-b">
+    <input class="dr-title" id="t-title" value="${esc(t.title)}" data-f="task.title" data-id="${t.id}" aria-label="Task title">
+    <div class="props">
+      <span>Assignee</span><select id="t-as" data-f="task.assignee" data-id="${t.id}">${memberOpts(t.assignee,true)}</select>
+      <span>Status</span><select id="t-st" data-f="task.status" data-id="${t.id}">${STATUSES.map(([k,l])=>`<option value="${k}" ${k===t.status?'selected':''}>${l}</option>`).join('')}</select>
+      <span>Phase</span><select id="t-ph" data-f="task.phase" data-id="${t.id}">${PHASES.map((ph,i)=>`<option value="${i}" ${i===t.phase?'selected':''}>${i+1}. ${ph}</option>`).join('')}</select>
+      <span>Priority</span><select id="t-pr" data-f="task.priority" data-id="${t.id}">${['High','Medium','Low'].map(x=>`<option ${x===t.priority?'selected':''}>${x}</option>`).join('')}</select>
+      <span>Start</span><input id="t-sd" type="date" value="${t.start||''}" data-f="task.start" data-id="${t.id}">
+      <span>Due</span><input id="t-dd" type="date" value="${t.due||''}" data-f="task.due" data-id="${t.id}">
+      <span>Project</span><select id="t-pj" data-f="task.projectId" data-id="${t.id}">${projOpts(t.projectId)}</select>
+    </div>
+    <label class="lbl">Notes<textarea class="field" id="t-notes" data-f="task.notes" data-id="${t.id}" placeholder="Brief, links to drive folders, call sheets…">${esc(t.notes||'')}</textarea></label>
+    <div><div class="eyebrow" style="margin-bottom:6px">Subtasks</div>
+      ${t.subtasks.map((s,i)=>`<div class="sub"><button class="chk ${s.d?'on':''}" data-act="sub-toggle" data-id="${t.id}" data-i="${i}" aria-label="Toggle subtask"></button><input type="text" id="sub-${t.id}-${i}" value="${esc(s.t)}" data-f="sub.t" data-id="${t.id}" data-i="${i}" aria-label="Subtask"><button class="btn sm ghost" data-act="sub-del" data-id="${t.id}" data-i="${i}" aria-label="Remove subtask">✕</button></div>`).join('')}
+      <form data-form="add-sub" data-id="${t.id}" class="sub"><span class="muted">+</span><input type="text" id="addsub-${t.id}" name="t" placeholder="Add subtask" aria-label="Add subtask"></form>
+    </div>
+    <div><div class="eyebrow" style="margin-bottom:8px">Comments</div>
+      <div style="display:flex;flex-direction:column;gap:10px">${t.comments.map(c=>`<div class="comment">${av(c.who)}<div class="bub"><div class="small"><b>${esc((M(c.who)||{}).name||'')}</b> <span class="muted">${esc(c.at)}</span></div><div>${esc(c.text)}</div></div></div>`).join('')}</div>
+      <form data-form="comment" data-id="${t.id}" style="display:flex;gap:8px;margin-top:10px"><input class="field" id="cm-${t.id}" name="text" placeholder="Write a comment as ${esc((M(S.me)||{}).name||'')}" aria-label="Comment"><button class="btn primary">Send</button></form>
+    </div>
+  </div>`;
+}
+
+function drawerDelivery(d){
+  const s=qcStep(d);const p=P(d.projectId)||{};const delivered=d.status==='Delivered';
+  return `<div class="dr-h"><span class="eyebrow">Delivery check</span><span class="small muted" style="margin-left:auto">${esc(p.name||'')}</span><button class="btn sm ghost" data-act="del-delivery" data-id="${d.id}">Delete</button><button class="btn sm ghost" data-act="close-drawer" aria-label="Close">✕</button></div>
+  <div class="dr-b">
+    <input class="dr-title" id="d-title" value="${esc(d.title)}" data-f="dl.title" data-id="${d.id}" aria-label="Deliverable title">
+    <div class="props">
+      <span>Spec</span><input id="d-spec" value="${esc(d.spec||'')}" data-f="dl.spec" data-id="${d.id}" placeholder="Format, resolution, codec, languages">
+      <span>Owner</span><select id="d-own" data-f="dl.owner" data-id="${d.id}">${memberOpts(d.owner,true)}</select>
+      <span>Due</span><input id="d-due" type="date" value="${d.due||''}" data-f="dl.due" data-id="${d.id}">
+      <span>Progress</span><span>${qcDots(d)} ${pill(...qcLabel(d))}</span>
+    </div>
+    ${delivered?`<div class="callout ok"><b>Delivered.</b> All five checks were signed off. ${d.deliveredAt?'Logged '+esc(d.deliveredAt)+'.':''}</div>`:s===5?`<div class="callout ok"><b>All five checks passed.</b> Record the delivery to close this deliverable.<div style="margin-top:8px"><button class="btn primary sm" data-act="mark-delivered" data-id="${d.id}">Record as delivered</button></div></div>`:d.returned?`<div class="callout bad"><b>Returned for fixes at step ${s+1}.</b> ${esc(d.returned)}</div>`:''}
+    ${QC.map((q,i)=>{const c=d.checks[i];const st=c.by?'done':i===s?'cur':'locked';const all=c.items.every(Boolean);const locked=i>s;
+      return `<div class="qstep ${st}"><div class="qstep-h"><span class="n">${i+1}</span><div style="flex:1;min-width:0"><div style="font-weight:700">${q.name}</div><div class="small muted">Checked by ${q.owner}</div></div>${c.by?`<span class="signed">✓ ${esc((M(c.by)||{}).name||'')}</span>`:`<span class="small muted num">${c.items.filter(Boolean).length}/${c.items.length}</span>`}</div>
+      <div class="qstep-b">${q.items.map((it,j)=>`<label class="qitem"><input type="checkbox" ${c.items[j]?'checked':''} ${locked||c.by||delivered?'disabled':''} data-act="qc-item" data-id="${d.id}" data-i="${i}" data-j="${j}"><span>${esc(it)}</span></label>`).join('')}
+        ${c.by?`<div class="signoff"><span class="small muted">Signed off ${esc(c.at)}${c.note?' · '+esc(c.note):''}</span>${!delivered&&i===s-1?`<button class="btn sm ghost" data-act="qc-unsign" data-id="${d.id}" data-i="${i}" style="margin-left:auto">Undo sign-off</button>`:''}</div>`:
+        (i===s&&!delivered)?`<div class="signoff"><select class="field" id="so-${d.id}-${i}" style="width:auto">${memberOpts(S.me)}</select><button class="btn ${all?'primary':''} sm" data-act="qc-sign" data-id="${d.id}" data-i="${i}" ${all?'':'disabled'} title="${all?'':'Tick every check first'}">Sign off step ${i+1}</button><button class="btn sm danger" data-act="qc-return" data-id="${d.id}" data-i="${i}">Return for fixes</button></div>`:''}
+      </div></div>`}).join('')}
+    ${d.returns&&d.returns.length?`<div><div class="eyebrow" style="margin-bottom:6px">Return log</div>${d.returns.map(r=>`<div class="small" style="padding:4px 0;border-bottom:1px solid var(--line)"><b>Step ${r.step}</b> · ${esc((M(r.by)||{}).name||'')} · ${esc(r.at)}: ${esc(r.note)}</div>`).join('')}</div>`:''}
+  </div>`;
+}
+
+function drawerAssumption(a){
+  const dn=aDone(a),s=aStep(a);const p=P(a.projectId)||{};const r=riskScore(a);
+  const blk=(i,inner)=>`<div class="qstep ${dn[i]?'done':i===s?'cur':''}"><div class="qstep-h"><span class="n">${i+1}</span><div style="flex:1;min-width:0"><div style="font-weight:700">${ASTEPS[i].name}</div><div class="small muted">${ASTEPS[i].hint}</div></div>${dn[i]?'<span class="signed">✓</span>':''}</div><div class="qstep-b">${inner}</div></div>`;
+  const rate=(f,v)=>`<select class="field" id="a-${f}-${a.id}" data-f="as.${f}" data-id="${a.id}"><option value="0">–</option>${[1,2,3,4,5].map(n=>`<option value="${n}" ${n==v?'selected':''}>${n}</option>`).join('')}</select>`;
+  return `<div class="dr-h"><span class="eyebrow">Assumption</span><span class="small muted" style="margin-left:auto">${esc(p.name||'')}</span><button class="btn sm ghost" data-act="del-assumption" data-id="${a.id}">Delete</button><button class="btn sm ghost" data-act="close-drawer" aria-label="Close">✕</button></div>
+  <div class="dr-b">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${aDots(a)} ${aState(a)} <span class="small muted">Risk</span> ${riskChip(a)}</div>
+    ${blk(0,`<textarea class="field" id="a-text-${a.id}" data-f="as.text" data-id="${a.id}" placeholder="We assume…">${esc(a.text)}</textarea><div class="grid2"><label class="lbl">Category<select class="field" id="a-cat-${a.id}" data-f="as.category" data-id="${a.id}">${ACATS.map(c=>`<option ${c===a.category?'selected':''}>${c}</option>`).join('')}</select></label><label class="lbl">Project<select class="field" id="a-pj-${a.id}" data-f="as.projectId" data-id="${a.id}">${projOpts(a.projectId)}</select></label></div>`)}
+    ${blk(1,`<label class="lbl">Source / evidence<input class="field" id="a-ev-${a.id}" value="${esc(a.evidence)}" data-f="as.evidence" data-id="${a.id}" placeholder="Contract clause, client email, recce notes…"></label><label class="lbl">Confidence<select class="field" id="a-cf-${a.id}" data-f="as.confidence" data-id="${a.id}"><option value="">Choose…</option>${CONF.map(c=>`<option ${c===a.confidence?'selected':''}>${c}</option>`).join('')}</select></label>`)}
+    ${blk(2,`<label class="lbl">If this is wrong…<textarea class="field" id="a-iw-${a.id}" data-f="as.ifWrong" data-id="${a.id}" placeholder="Cost, schedule, quality or reputational effect">${esc(a.ifWrong)}</textarea></label><div class="grid2"><label class="lbl">Impact (1–5)${rate('impact',a.impact)}</label><label class="lbl">Likelihood (1–5)${rate('likelihood',a.likelihood)}</label></div>${r>=15?'<div class="callout bad">Critical risk. Validate before committing budget or dates.</div>':''}`)}
+    ${blk(3,`<div class="grid2"><label class="lbl">Owner<select class="field" id="a-ow-${a.id}" data-f="as.owner" data-id="${a.id}">${memberOpts(a.owner,true)}</select></label><label class="lbl">Validate by<input class="field" type="date" id="a-by-${a.id}" value="${a.by||''}" data-f="as.by" data-id="${a.id}"></label></div><label class="lbl">Method<input class="field" id="a-me-${a.id}" value="${esc(a.method)}" data-f="as.method" data-id="${a.id}" placeholder="Ask client in writing, check PO, site recce…"></label>`)}
+    ${blk(4,a.outcome?`<div class="callout ${a.outcome==='Confirmed'?'ok':'bad'}"><b>${esc(a.outcome)}</b> · ${esc((M(a.decidedBy)||{}).name||'')} · ${esc(a.decidedAt)}<div>${esc(a.outcomeNote)}</div></div><button class="btn sm ghost" data-act="as-reopen" data-id="${a.id}">Reopen decision</button>`:
+      (s<4?`<div class="small muted">Complete steps 1–4 first.</div>`:`<label class="lbl">Outcome<select class="field" id="a-oc-${a.id}">${OUTCOMES.map(o=>`<option>${o}</option>`).join('')}</select></label><label class="lbl">Decision note<input class="field" id="a-on-${a.id}" placeholder="What was agreed, and where it is recorded"></label><div><button class="btn primary sm" data-act="as-decide" data-id="${a.id}">Log decision</button></div>`))}
+  </div>`;
+}
+
+/* ---------- modals ---------- */
+function modal(title,body,okLabel,onOk,extraBtn){
+  const w=document.getElementById('modal');
+  w.innerHTML=`<form class="modal" id="modalForm"><div class="modal-h"><h2>${title}</h2><button type="button" class="btn sm ghost" data-act="close-modal" style="margin-left:auto" aria-label="Close">✕</button></div><div class="modal-b">${body}</div><div class="modal-f">${extraBtn||''}<button type="button" class="btn" data-act="close-modal">Cancel</button>${okLabel?`<button class="btn primary">${okLabel}</button>`:''}</div></form>`;
+  w.hidden=false;
+  const f=document.getElementById('modalForm');
+  f.onsubmit=e=>{e.preventDefault();const data=Object.fromEntries(new FormData(f).entries());if(onOk(data,f)!==false){closeModal()}};
+  const first=f.querySelector('input,select,textarea');if(first)setTimeout(()=>first.focus(),20);
+}
+function closeModal(){const w=document.getElementById('modal');w.hidden=true;w.innerHTML=''}
+
+function projectForm(p){
+  p=p||{name:'',client:'',type:'Documentary',lead:S.me,start:ymd(TODAY),due:addDays(30),budget:'',currency:'ETB',color:COLORS[S.projects.length%COLORS.length],description:'',status:'Not started'};
+  return `<label class="lbl">Project name<input class="field" name="name" id="pf-name" required value="${esc(p.name)}" placeholder="e.g. Maternal health campaign film"></label>
+  <div class="grid2"><label class="lbl">Client<input class="field" name="client" id="pf-client" value="${esc(p.client)}" placeholder="Client or partner"></label>
+  <label class="lbl">Type<select class="field" name="type" id="pf-type">${PTYPES.map(t=>`<option ${t===p.type?'selected':''}>${t}</option>`).join('')}</select></label></div>
+  <div class="grid3"><label class="lbl">Start<input class="field" type="date" name="start" id="pf-start" required value="${p.start}"></label><label class="lbl">Final delivery<input class="field" type="date" name="due" id="pf-due" required value="${p.due}"></label><label class="lbl">Lead<select class="field" name="lead" id="pf-lead">${memberOpts(p.lead)}</select></label></div>
+  <div class="grid3"><label class="lbl">Budget<input class="field" type="number" min="0" step="1000" name="budget" id="pf-budget" value="${esc(p.budget)}"></label><label class="lbl">Currency<select class="field" name="currency" id="pf-cur">${['ETB','USD','EUR','KES','GBP'].map(c=>`<option ${c===p.currency?'selected':''}>${c}</option>`).join('')}</select></label><label class="lbl">Colour<select class="field" name="color" id="pf-color">${COLORS.map(c=>`<option value="${c}" ${c===p.color?'selected':''} style="background:${c};color:#fff">${c}</option>`).join('')}</select></label></div>
+  <label class="lbl">Brief<textarea class="field" name="description" id="pf-desc" placeholder="Objective, audience, deliverables, languages">${esc(p.description)}</textarea></label>`;
+}
+
+/* ---------- actions ---------- */
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2200)}
+function commit(msg){save();render();if(msg)toast(msg)}
+
+const actions={
+  'menu':()=>document.getElementById('side').classList.toggle('open'),
+  'close-drawer':()=>closeDrawer(),
+  'close-modal':()=>closeModal(),
+  'theme':()=>{const r=document.documentElement;const cur=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const nx=cur==='dark'?'light':'dark';r.setAttribute('data-theme',nx);S.ui.theme=nx;save()},
+  'tab':el=>{S.ui.tab[el.dataset.id]=el.dataset.tab;commit()},
+  'collapse':el=>{S.ui.collapsed[el.dataset.id]=!S.ui.collapsed[el.dataset.id];commit()},
+  'cal':el=>{const d=+el.dataset.d;if(!d){S.ui.calMonth=null}else{const c=parse(S.ui.calMonth||ymd(new Date(TODAY.getFullYear(),TODAY.getMonth(),1)));c.setMonth(c.getMonth()+d);S.ui.calMonth=ymd(c)}commit()},
+  'open-task':el=>openDrawer('task',el.dataset.id),
+  'open-delivery':el=>openDrawer('delivery',el.dataset.id),
+  'open-assumption':el=>openDrawer('assumption',el.dataset.id),
+  'toggle-done':el=>{const t=T(el.dataset.id);t.status=t.status==='done'?'todo':'done';if(t.status==='done')log('completed “'+t.title+'”');commit(t.status==='done'?'Task completed':'Task reopened')},
+  'del-task':el=>confirmBox('Delete this task?','The task, its subtasks and comments will be removed.',()=>{S.tasks=S.tasks.filter(t=>t.id!==el.dataset.id);drawerState=null;closeDrawer(true);commit('Task deleted')}),
+  'del-delivery':el=>confirmBox('Delete this deliverable?','Its 5-step check history will be removed.',()=>{S.deliveries=S.deliveries.filter(t=>t.id!==el.dataset.id);closeDrawer(true);commit('Deliverable deleted')}),
+  'del-assumption':el=>confirmBox('Delete this assumption?','It will be removed from the register.',()=>{S.assumptions=S.assumptions.filter(t=>t.id!==el.dataset.id);closeDrawer(true);commit('Assumption deleted')}),
+  'sub-toggle':el=>{const t=T(el.dataset.id);const s=t.subtasks[+el.dataset.i];s.d=!s.d;commit()},
+  'sub-del':el=>{const t=T(el.dataset.id);t.subtasks.splice(+el.dataset.i,1);commit()},
+  'qc-item':el=>{const d=D(el.dataset.id);d.checks[+el.dataset.i].items[+el.dataset.j]=el.checked;save();render()},
+  'qc-sign':el=>{const d=D(el.dataset.id),i=+el.dataset.i;const c=d.checks[i];if(!c.items.every(Boolean))return toast('Tick every check before signing off');if(i!==qcStep(d))return;const sel=document.getElementById('so-'+d.id+'-'+i);c.by=sel?sel.value:S.me;c.at=nowStamp();d.returned='';log('signed off step '+(i+1)+' ('+QC[i].name+') on “'+d.title+'”');commit('Step '+(i+1)+' signed off')},
+  'qc-unsign':el=>{const d=D(el.dataset.id),i=+el.dataset.i;d.checks[i].by='';d.checks[i].at='';commit('Sign-off removed')},
+  'qc-return':el=>{const d=D(el.dataset.id),i=+el.dataset.i;
+    modal('Return for fixes',`<p class="muted" style="margin:0">Describe what failed at step ${i+1} (${QC[i].name}). A fix task is created for the deliverable owner, and the check restarts from this step.</p><label class="lbl">What needs fixing<textarea class="field" name="note" id="ret-note" required placeholder="e.g. Subtitles drift from 04:12; lower-third spells the cooperative name wrong"></textarea></label>`,'Return and create fix task',data=>{
+      const note=(data.note||'').trim();if(!note)return false;
+      for(let k=i;k<5;k++){d.checks[k].by='';d.checks[k].at='';d.checks[k].items=d.checks[k].items.map(()=>false)}
+      d.returned=note;d.returns=d.returns||[];d.returns.unshift({step:i+1,by:S.me,at:nowStamp(),note});
+      S.tasks.push({id:uid('t'),projectId:d.projectId,title:'Fix: '+note.slice(0,70),phase:3,assignee:d.owner||S.me,start:ymd(TODAY),due:addDays(2),priority:'High',status:'todo',subtasks:[],comments:[],notes:'Returned from delivery check step '+(i+1)+' on “'+d.title+'”.\n\n'+note});
+      log('returned “'+d.title+'” at step '+(i+1));commit('Returned. Fix task created');
+    })},
+  'mark-delivered':el=>{const d=D(el.dataset.id);if(qcStep(d)<5)return toast('All five steps must be signed off first');d.status='Delivered';d.deliveredAt=nowStamp();log('marked “'+d.title+'” as delivered');commit('Recorded as delivered')},
+  'as-decide':el=>{const a=A(el.dataset.id);a.outcome=document.getElementById('a-oc-'+a.id).value;a.outcomeNote=document.getElementById('a-on-'+a.id).value;a.decidedBy=S.me;a.decidedAt=nowStamp();
+    if(a.outcome.startsWith('Rejected'))S.tasks.push({id:uid('t'),projectId:a.projectId,title:'Change request: '+a.text.replace(/^We assume\s*/i,'').slice(0,60),phase:0,assignee:(P(a.projectId)||{}).lead||S.me,start:ymd(TODAY),due:addDays(3),priority:'High',status:'todo',subtasks:[{t:'Update scope, budget or schedule',d:false},{t:'Get client sign-off on the change',d:false}],comments:[],notes:'Assumption rejected: '+a.text+'\n\n'+a.outcomeNote});
+    log('logged assumption as '+a.outcome.toLowerCase());commit(a.outcome.startsWith('Rejected')?'Logged. Change request task created':'Decision logged')},
+  'as-reopen':el=>{const a=A(el.dataset.id);a.outcome='';a.decidedBy='';a.decidedAt='';commit()},
+  'new-project':()=>modal('New project',projectForm()+`<label class="qitem"><input type="checkbox" name="tpl" id="pf-tpl" checked><span>Create the production phase tasks and standard assumptions for this project type</span></label>`,'Create project',data=>{
+      if(data.due<data.start){toast('Final delivery must be after the start date');return false}
+      const p={id:uid('p'),name:data.name,client:data.client||'—',type:data.type,status:'Not started',lead:data.lead,start:data.start,due:data.due,budget:+data.budget||0,currency:data.currency,color:data.color,description:data.description};
+      S.projects.push(p);if(data.tpl){applyTemplate(S,p,false);TEMPLATE_ASSUMPTIONS.forEach(([c,t])=>S.assumptions.push({id:uid('a'),projectId:p.id,category:c,text:'We assume '+t.charAt(0).toLowerCase()+t.slice(1),evidence:'',confidence:'',ifWrong:'',impact:0,likelihood:0,owner:'',method:'',by:'',outcome:'',outcomeNote:'',decidedBy:'',decidedAt:''}))}
+      log('created project “'+p.name+'”');save();go('project-'+p.id);toast('Project created')}),
+  'edit-project':el=>{const p=P(el.dataset.id);modal('Edit project',projectForm(p),'Save',data=>{Object.assign(p,{name:data.name,client:data.client,type:data.type,lead:data.lead,start:data.start,due:data.due,budget:+data.budget||0,currency:data.currency,color:data.color,description:data.description});commit('Project saved')},`<button type="button" class="btn danger" data-act="del-project" data-id="${p.id}" style="margin-right:auto">Delete project</button>`)},
+  'del-project':el=>{const id=el.dataset.id;closeModal();confirmBox('Delete this project?','All its tasks, deliverables and assumptions will be removed. Export first if you want a copy.',()=>{S.projects=S.projects.filter(p=>p.id!==id);S.tasks=S.tasks.filter(t=>t.projectId!==id);S.deliveries=S.deliveries.filter(t=>t.projectId!==id);S.assumptions=S.assumptions.filter(t=>t.projectId!==id);save();go('home');toast('Project deleted')})},
+  'new-task':el=>{if(!S.projects.length)return toast('Create a project first');const r=route();const pid=(el&&el.dataset.id)||(r.name==='project'?r.id:S.projects[0].id);
+    modal('New task',`<label class="lbl">Task<input class="field" name="title" id="nt-title" required placeholder="e.g. Book sound recordist for shoot day"></label>
+    <div class="grid2"><label class="lbl">Project<select class="field" name="projectId" id="nt-p">${projOpts(pid)}</select></label><label class="lbl">Phase<select class="field" name="phase" id="nt-ph">${PHASES.map((p,i)=>`<option value="${i}">${i+1}. ${p}</option>`).join('')}</select></label></div>
+    <div class="grid3"><label class="lbl">Assignee<select class="field" name="assignee" id="nt-a">${memberOpts(S.me,true)}</select></label><label class="lbl">Due<input class="field" type="date" name="due" id="nt-d" value="${addDays(3)}"></label><label class="lbl">Priority<select class="field" name="priority" id="nt-pr"><option>Medium</option><option>High</option><option>Low</option></select></label></div>`,'Add task',data=>{
+      const t={id:uid('t'),projectId:data.projectId,title:data.title,phase:+data.phase,assignee:data.assignee,start:ymd(TODAY),due:data.due,priority:data.priority,status:(el&&el.dataset.status)||'todo',subtasks:[],comments:[],notes:''};S.tasks.push(t);log('added “'+t.title+'”');commit('Task added')})},
+  'new-delivery':el=>{if(!S.projects.length)return toast('Create a project first');const r=route();const pid=(el&&el.dataset.id)||(r.name==='project'?r.id:S.projects[0].id);
+    modal('New deliverable',`<label class="lbl">Deliverable<input class="field" name="title" id="nd-title" required placeholder="e.g. Testimonial film 3′ – Amharic subtitles"></label><label class="lbl">Technical spec<input class="field" name="spec" id="nd-spec" placeholder="e.g. H.264 1080p 16:9, 25 fps, -14 LUFS, SRT"></label>
+    <div class="grid3"><label class="lbl">Project<select class="field" name="projectId" id="nd-p">${projOpts(pid)}</select></label><label class="lbl">Owner<select class="field" name="owner" id="nd-o">${memberOpts(S.me)}</select></label><label class="lbl">Due<input class="field" type="date" name="due" id="nd-d" value="${addDays(14)}"></label></div>`,'Add deliverable',data=>{
+      const d={id:uid('d'),projectId:data.projectId,title:data.title,spec:data.spec,owner:data.owner,due:data.due,status:'In QC',returns:[],checks:QC.map(q=>({items:q.items.map(()=>false),by:'',at:'',note:''}))};S.deliveries.push(d);log('added deliverable “'+d.title+'”');save();render();openDrawer('delivery',d.id);toast('Deliverable added')})},
+  'new-assumption':el=>{if(!S.projects.length)return toast('Create a project first');const r=route();const pid=(el&&el.dataset.id)||(r.name==='project'?r.id:S.projects[0].id);
+    const a={id:uid('a'),projectId:pid,category:'Scope',text:'We assume ',evidence:'',confidence:'',ifWrong:'',impact:0,likelihood:0,owner:'',method:'',by:'',outcome:'',outcomeNote:'',decidedBy:'',decidedAt:''};S.assumptions.push(a);save();render();openDrawer('assumption',a.id);setTimeout(()=>{const x=document.getElementById('a-text-'+a.id);if(x){x.focus();x.setSelectionRange(x.value.length,x.value.length)}},30)},
+  'new-member':()=>memberModal(),
+  'edit-member':el=>memberModal(M(el.dataset.id)),
+  'export':()=>{const json=JSON.stringify(Object.assign({},S,{ui:undefined}),null,1);
+    try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));a.download='youthopians-studio-'+ymd(TODAY)+'.json';document.body.appendChild(a);a.click();a.remove()}catch(e){}
+    modal('Export workspace',`<p class="muted" style="margin:0">The desktop app saves a .json file to your Downloads folder. In a browser preview, copy the text below and keep it somewhere safe.</p><textarea class="field" id="exp-json" style="min-height:220px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.75rem" readonly>${esc(json)}</textarea>`,'',()=>{},`<button type="button" class="btn primary" data-act="copy-export" style="margin-right:auto">Copy to clipboard</button>`)},
+  'copy-export':()=>{const t=document.getElementById('exp-json');const fb=()=>{t.focus();t.select();toast('Selected. Press Ctrl/⌘+C')};try{navigator.clipboard.writeText(t.value).then(()=>toast('Copied'),fb)}catch(e){fb()}},
+  'import':()=>modal('Import workspace',`<p class="muted" style="margin:0">Replace everything in this workspace with an exported file. Export first if you want to keep the current data.</p><div><button type="button" class="btn" data-act="pick-file">Choose .json file…</button></div><label class="lbl">…or paste exported text<textarea class="field" name="json" id="imp-json" style="min-height:160px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.75rem"></textarea></label>`,'Import pasted text',data=>doImport(data.json)),
+  'pick-file':()=>document.getElementById('importFile').click(),
+  'reset':()=>modal('Reset workspace',`<p style="margin:0">Choose how to reset. This replaces everything in this workspace.</p>`,'',()=>{},`<button type="button" class="btn" data-act="reset-sample">Reload samples</button><button type="button" class="btn danger" data-act="reset-empty" style="margin-right:auto">Start empty</button>`),
+  'reset-sample':()=>{S=seed();closeModal();save();go('home');toast('Samples reloaded')},
+  'reset-empty':()=>{const team=S.team;S=seed();S.sample=false;S.team=team.length?team:S.team;S.me=S.team[0].id;S.projects=[];S.tasks=[];S.deliveries=[];S.assumptions=[];S.activity=[];closeModal();save();go('home');toast('Workspace cleared. Team kept')}
+};
+function doImport(txt){try{const n=JSON.parse(txt);if(!n||!Array.isArray(n.projects)||!Array.isArray(n.team))throw 0;n.ui={tab:{},collapsed:{},filters:{}};S=n;save();closeModal();go('home');toast('Workspace imported');return true}catch(e){toast('That file is not a Youthopians Studio export');return false}}
+document.getElementById('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>doImport(r.result);r.readAsText(f);e.target.value=''});
+function confirmBox(title,msg,fn){modal(title,`<p style="margin:0">${esc(msg)}</p>`,'Delete',()=>{fn()})}
+function memberModal(m){
+  modal(m?'Edit member':'Add member',`<div class="grid2"><label class="lbl">Name<input class="field" name="name" id="mm-n" required value="${esc(m?m.name:'')}"></label><label class="lbl">Role<input class="field" name="role" id="mm-r" required value="${esc(m?m.role:'')}" placeholder="e.g. Director of Photography"></label></div><label class="lbl">Colour<select class="field" name="color" id="mm-c">${COLORS.map(c=>`<option value="${c}" ${m&&m.color===c?'selected':''}>${c}</option>`).join('')}</select></label>`,m?'Save':'Add member',data=>{
+    if(m){Object.assign(m,data)}else S.team.push({id:uid('m'),name:data.name,role:data.role,color:data.color});commit(m?'Saved':'Member added')},
+    m&&S.team.length>1?`<button type="button" class="btn danger" data-act="del-member" data-id="${m.id}" style="margin-right:auto">Remove</button>`:'');
+}
+actions['del-member']=el=>{const id=el.dataset.id;S.team=S.team.filter(m=>m.id!==id);S.tasks.forEach(t=>{if(t.assignee===id)t.assignee=''});if(S.me===id)S.me=S.team[0].id;closeModal();commit('Member removed. Their tasks are unassigned')};
+
+/* field edits */
+function setField(el){
+  const f=el.dataset.f,id=el.dataset.id,v=el.value;
+  if(f==='me'){S.me=v;return commit()}
+  if(f==='filter.dl'){S.ui.filters.dl=v;return commit()}
+  if(f==='filter.as'){S.ui.filters.as=v;return commit()}
+  const [obj,key]=f.split('.');
+  if(obj==='project'){const p=P(id);p[key]=v;if(key==='status')log('set “'+p.name+'” to '+v);return commit()}
+  if(obj==='task'){const t=T(id);t[key]=key==='phase'?+v:v;if(key==='status'&&v==='done')log('completed “'+t.title+'”');return commit()}
+  if(obj==='sub'){const t=T(id);t.subtasks[+el.dataset.i].t=v;return commit()}
+  if(obj==='dl'){D(id)[key]=v;return commit()}
+  if(obj==='as'){const a=A(id);a[key]=(key==='impact'||key==='likelihood')?+v:v;return commit()}
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');if(g&&!e.target.closest('[data-act]')){go(g.dataset.go);return}
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const a=el.dataset.act;
+  if(el.tagName==='INPUT'&&el.type==='checkbox'){actions[a]&&actions[a](el);return}
+  // inner buttons inside a clickable row win
+  e.preventDefault();e.stopPropagation();
+  if(actions[a])actions[a](el);
+});
+document.addEventListener('change',e=>{if(e.target.dataset&&e.target.dataset.f)setField(e.target)});
+document.addEventListener('submit',e=>{
+  const f=e.target;if(!f.dataset.form)return;e.preventDefault();
+  const v=(f.elements[0]&&f.elements[0].value||'').trim();if(!v)return;
+  if(f.dataset.form==='quick-add'){const p=P(f.dataset.id);const ph=+f.dataset.phase;S.tasks.push({id:uid('t'),projectId:p.id,title:v,phase:ph,assignee:S.me,start:ymd(TODAY),due:addDays(3),priority:'Medium',status:'todo',subtasks:[],comments:[],notes:''});log('added “'+v+'”');save();render();const n=document.getElementById('qa-'+p.id+'-'+ph);if(n)n.focus()}
+  if(f.dataset.form==='add-sub'){const t=T(f.dataset.id);t.subtasks.push({t:v,d:false});save();render();const n=document.getElementById('addsub-'+t.id);if(n)n.focus()}
+  if(f.dataset.form==='comment'){const t=T(f.dataset.id);t.comments.push({who:S.me,at:nowStamp(),text:v});log('commented on “'+t.title+'”');commit('Comment added')}
+});
+/* drag and drop on board */
+document.addEventListener('dragstart',e=>{const c=e.target.closest('[data-drag]');if(c){e.dataTransfer.setData('text/plain',c.dataset.drag);e.dataTransfer.effectAllowed='move'}});
+document.addEventListener('dragover',e=>{const c=e.target.closest('[data-drop]');if(c){e.preventDefault();c.classList.add('over')}});
+document.addEventListener('dragleave',e=>{const c=e.target.closest('[data-drop]');if(c)c.classList.remove('over')});
+document.addEventListener('drop',e=>{const c=e.target.closest('[data-drop]');if(!c)return;e.preventDefault();const t=T(e.dataTransfer.getData('text/plain'));if(t&&t.status!==c.dataset.drop){t.status=c.dataset.drop;if(t.status==='done')log('completed “'+t.title+'”');commit('Moved to '+STATUSES.find(s=>s[0]===t.status)[1])}else render()});
+/* search */
+const q=document.getElementById('q'),res=document.getElementById('results');
+q.addEventListener('input',()=>{const s=q.value.trim().toLowerCase();if(s.length<2){res.hidden=true;return}
+  const hits=[].concat(
+    S.projects.filter(p=>(p.name+' '+p.client).toLowerCase().includes(s)).map(p=>`<button data-go="project-${p.id}"><span class="tag">Project</span>${esc(p.name)}</button>`),
+    S.tasks.filter(t=>t.title.toLowerCase().includes(s)).slice(0,10).map(t=>`<button data-act="open-task" data-id="${t.id}"><span class="tag">Task</span>${esc(t.title)} <span class="muted small">· ${esc((P(t.projectId)||{}).name||'')}</span></button>`),
+    S.deliveries.filter(d=>d.title.toLowerCase().includes(s)).map(d=>`<button data-act="open-delivery" data-id="${d.id}"><span class="tag">Deliverable</span>${esc(d.title)}</button>`),
+    S.assumptions.filter(a=>a.text.toLowerCase().includes(s)).map(a=>`<button data-act="open-assumption" data-id="${a.id}"><span class="tag">Assumption</span>${esc(a.text)}</button>`));
+  res.innerHTML=hits.join('')||'<div class="empty">No matches</div>';res.hidden=false});
+document.addEventListener('click',e=>{if(!e.target.closest('.search')){res.hidden=true}else if(e.target.closest('.results button')){res.hidden=true;q.value=''}},true);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if(!document.getElementById('modal').hidden)closeModal();else if(drawerState)closeDrawer();res.hidden=true}
+  const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+  if(!typing&&e.key==='/'){e.preventDefault();q.focus()}
+  if(!typing&&(e.key==='n'||e.key==='N')&&document.getElementById('modal').hidden){e.preventDefault();actions['new-task']()}
+});
+
+if(S.ui.theme)document.documentElement.setAttribute('data-theme',S.ui.theme);
+render();
+})();
+</script>
